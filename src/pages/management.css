@@ -986,3 +986,588 @@
     transform: translateX(0);
   }
 }
+/* =========================================================
+   Dynamic Alimi Assistant — Settings & live inbox
+   ========================================================= */
+.assistant-admin-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.assistant-settings-card,
+.assistant-messages-card {
+  overflow: hidden;
+}
+
+.assistant-settings-heading,
+.assistant-message-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.assistant-settings-heading > div,
+.assistant-message-header > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.assistant-settings-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: var(--management-primary);
+  background: color-mix(in srgb, var(--management-primary) 10%, var(--management-card));
+}
+
+.assistant-enable-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.assistant-enable-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.assistant-enable-toggle > span {
+  position: relative;
+  width: 42px;
+  height: 23px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: .2s ease;
+}
+
+.assistant-enable-toggle > span::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 7px rgba(0,0,0,.15);
+  transition: .2s ease;
+}
+
+.assistant-enable-toggle input:checked + span {
+  background: #16a36f;
+}
+
+.assistant-enable-toggle input:checked + span::after {
+  transform: translateX(-19px);
+}
+
+.assistant-enable-toggle b {
+  font-size: 11px;
+}
+
+.assistant-settings-form {
+  padding-top: 18px;
+}
+
+.assistant-field-help {
+  margin-top: 6px;
+  display: block;
+  color: var(--management-muted);
+  font-size: 10px;
+}
+
+.assistant-field-help code {
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--management-primary);
+  background: color-mix(in srgb, var(--management-primary) 8%, transparent);
+}
+
+.assistant-settings-actions .management-save-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.assistant-unread-summary {
+  padding: 7px 10px;
+  border-radius: 999px;
+  color: var(--management-primary);
+  background: color-mix(in srgb, var(--management-primary) 9%, transparent);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.assistant-inbox {
+  min-height: 520px;
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  border-top: 1px solid var(--management-border);
+}
+
+.assistant-inbox-list {
+  min-width: 0;
+  padding: 12px;
+  border-inline-end: 1px solid var(--management-border);
+  background: color-mix(in srgb, var(--management-bg) 55%, var(--management-card));
+}
+
+.assistant-inbox-search {
+  height: 42px;
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--management-border);
+  border-radius: 11px;
+  color: var(--management-muted);
+  background: var(--management-card);
+}
+
+.assistant-inbox-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: var(--management-text);
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+}
+
+.assistant-conversation-list {
+  max-height: 455px;
+  margin-top: 10px;
+  display: grid;
+  gap: 7px;
+  overflow-y: auto;
+}
+
+.assistant-conversation-item {
+  width: 100%;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--management-text);
+  background: var(--management-card);
+  font: inherit;
+  text-align: right;
+  cursor: pointer;
+}
+
+.assistant-conversation-item:hover,
+.assistant-conversation-item.is-active {
+  border-color: color-mix(in srgb, var(--management-primary) 35%, var(--management-border));
+  background: color-mix(in srgb, var(--management-primary) 5%, var(--management-card));
+}
+
+.assistant-conversation-avatar {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  color: var(--management-primary);
+  background: color-mix(in srgb, var(--management-primary) 9%, var(--management-bg));
+}
+
+.assistant-conversation-copy {
+  min-width: 0;
+}
+
+.assistant-conversation-copy strong,
+.assistant-conversation-copy small {
+  display: block;
+}
+
+.assistant-conversation-copy strong {
+  font-size: 11px;
+}
+
+.assistant-conversation-copy small {
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--management-muted);
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assistant-conversation-meta {
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+}
+
+.assistant-conversation-meta time {
+  color: var(--management-muted);
+  font-size: 8px;
+}
+
+.assistant-conversation-meta b {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--management-primary);
+  font-size: 9px;
+}
+
+.assistant-empty-list {
+  padding: 40px 15px;
+  color: var(--management-muted);
+  text-align: center;
+  font-size: 11px;
+}
+
+.assistant-chat-admin {
+  min-width: 0;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  background: var(--management-card);
+}
+
+.assistant-chat-admin-header {
+  min-height: 62px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--management-border);
+}
+
+.assistant-chat-admin-header > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.assistant-chat-admin-header strong,
+.assistant-chat-admin-header small {
+  display: block;
+}
+
+.assistant-chat-admin-header strong {
+  font-size: 12px;
+}
+
+.assistant-chat-admin-header small {
+  margin-top: 3px;
+  color: var(--management-muted);
+  font-size: 9px;
+}
+
+.assistant-delete-chat {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--management-border);
+  border-radius: 10px;
+  color: #ef4444;
+  background: var(--management-card);
+  cursor: pointer;
+}
+
+.assistant-admin-messages {
+  min-height: 0;
+  flex: 1;
+  padding: 18px;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--management-primary) 5%, transparent), transparent 35%),
+    color-mix(in srgb, var(--management-bg) 45%, var(--management-card));
+}
+
+.assistant-admin-message {
+  width: fit-content;
+  max-width: min(74%, 620px);
+  margin-bottom: 13px;
+}
+
+.assistant-admin-message > span,
+.assistant-admin-message > time {
+  display: block;
+  color: var(--management-muted);
+  font-size: 8px;
+}
+
+.assistant-admin-message > span {
+  margin: 0 5px 4px;
+}
+
+.assistant-admin-message > div {
+  padding: 10px 12px;
+  border: 1px solid var(--management-border);
+  border-radius: 13px;
+  background: var(--management-card);
+  font-size: 11px;
+  line-height: 1.9;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, .04);
+}
+
+.assistant-admin-message > time {
+  margin: 4px 5px 0;
+}
+
+.assistant-admin-message.is-admin {
+  margin-inline-start: auto;
+}
+
+.assistant-admin-message.is-admin > div {
+  color: #fff;
+  border-color: var(--management-primary);
+  background: var(--management-primary);
+}
+
+.assistant-admin-message.is-user {
+  margin-inline-end: auto;
+}
+
+.assistant-admin-composer {
+  padding: 11px;
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+  border-top: 1px solid var(--management-border);
+}
+
+.assistant-admin-composer textarea {
+  min-height: 42px;
+  max-height: 100px;
+  flex: 1;
+  padding: 11px 12px;
+  resize: none;
+  border: 1px solid var(--management-border);
+  border-radius: 11px;
+  outline: 0;
+  color: var(--management-text);
+  background: var(--management-bg);
+  font: inherit;
+  font-size: 11px;
+}
+
+.assistant-admin-composer textarea:focus {
+  border-color: var(--management-primary);
+}
+
+.assistant-admin-composer button {
+  min-width: 88px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  background: var(--management-primary);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.assistant-admin-composer button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.assistant-chat-empty {
+  min-height: 520px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: var(--management-muted);
+  text-align: center;
+}
+
+.assistant-chat-empty svg {
+  color: color-mix(in srgb, var(--management-primary) 55%, var(--management-muted));
+}
+
+.assistant-chat-empty strong {
+  color: var(--management-text);
+  font-size: 13px;
+}
+
+.assistant-chat-empty p {
+  margin: 0;
+  font-size: 10px;
+}
+
+@media (max-width: 980px) {
+  .assistant-inbox {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .assistant-settings-heading,
+  .assistant-message-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .assistant-inbox {
+    display: block;
+  }
+
+  .assistant-inbox-list {
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--management-border);
+  }
+
+  .assistant-conversation-list {
+    max-height: 240px;
+  }
+
+  .assistant-chat-admin,
+  .assistant-chat-empty {
+    min-height: 480px;
+  }
+}
+
+/* =========================================================
+   Assistant settings sub-tabs + unread presence + bubble fix
+   ========================================================= */
+.assistant-settings-tabs {
+  min-height: 56px;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--management-border);
+  border-radius: 14px;
+  background: var(--management-card);
+  box-shadow: var(--management-shadow);
+}
+
+.assistant-settings-tabs button {
+  min-height: 40px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--management-muted);
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.assistant-settings-tabs button:hover {
+  color: var(--management-primary);
+  background: color-mix(in srgb, var(--management-primary) 6%, transparent);
+}
+
+.assistant-settings-tabs button.is-active {
+  color: #fff;
+  background: var(--management-primary);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--management-primary) 22%, transparent);
+}
+
+.assistant-settings-tabs button b {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  background: #ef4444;
+  font-size: 9px;
+}
+
+.assistant-conversation-avatar {
+  position: relative;
+  overflow: visible;
+}
+
+.assistant-profile-online-dot {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--management-card);
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #22c55e 14%, transparent);
+  animation: assistantUnreadPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes assistantUnreadPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.12); opacity: .72; }
+}
+
+.assistant-admin-message {
+  min-width: 0;
+  width: fit-content;
+  max-width: min(78%, 680px);
+}
+
+.assistant-admin-message > div {
+  width: fit-content;
+  min-width: 54px;
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+
+.assistant-admin-message > span,
+.assistant-admin-message > time {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assistant-admin-message.is-admin {
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+}
+
+.assistant-admin-message.is-user {
+  margin-inline-start: 0;
+  margin-inline-end: auto;
+}
+
+@media (max-width: 760px) {
+  .assistant-settings-tabs {
+    overflow-x: auto;
+  }
+
+  .assistant-settings-tabs button {
+    flex: 0 0 auto;
+  }
+
+  .assistant-admin-message {
+    max-width: 88%;
+  }
+}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
 import {
   Images,
@@ -18,6 +18,12 @@ import {
   Settings,
   Trash2,
   Users,
+  Bot,
+  MessageSquareText,
+  Send,
+  Save,
+  UserRound,
+  CheckCircle2,
   X,
 } from 'lucide-react'
 
@@ -26,6 +32,15 @@ import ProjectsAdmin from './ProjectsAdmin'
 import ProductsAdmin from './ProductsAdmin'
 import AboutAdmin from './AboutAdmin'
 import ContactAdmin from './ContactAdmin'
+import {
+  addAssistantMessage,
+  deleteAssistantConversation,
+  getAssistantConversations,
+  getAssistantSettings,
+  markAssistantConversationRead,
+  saveAssistantSettings,
+  subscribeAssistantStore,
+} from '../data/assistantStore'
 
 import './management.css'
 
@@ -321,72 +336,410 @@ function MessagesTab({ searchTerm }) {
 }
 
 function SettingsTab() {
+  const [settingsSection, setSettingsSection] = useState('assistant-settings')
+  const [settings, setSettings] = useState(() => getAssistantSettings())
+  const [conversations, setConversations] = useState(() =>
+    getAssistantConversations(),
+  )
+  const [activeConversationId, setActiveConversationId] = useState(null)
+  const [search, setSearch] = useState('')
+  const [reply, setReply] = useState('')
+  const [saved, setSaved] = useState(false)
+  const [sending, setSending] = useState(false)
+  const messagePaneRef = useRef(null)
+
+  const refreshAssistantData = () => {
+    setSettings(getAssistantSettings())
+    const nextConversations = getAssistantConversations()
+    setConversations(nextConversations)
+    setActiveConversationId((current) => {
+      if (current && nextConversations.some((item) => item.id === current)) {
+        return current
+      }
+      return null
+    })
+  }
+
+  useEffect(() => subscribeAssistantStore(refreshAssistantData), [])
+
+  const filteredConversations = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    if (!query) return conversations
+
+    return conversations.filter((conversation) => {
+      const fullText = [
+        conversation.visitorName,
+        ...conversation.messages.map((item) => item.text),
+      ]
+        .join(' ')
+        .toLowerCase()
+      return fullText.includes(query)
+    })
+  }, [conversations, search])
+
+  const activeConversation = useMemo(
+    () =>
+      conversations.find(
+        (conversation) => conversation.id === activeConversationId,
+      ) || null,
+    [activeConversationId, conversations],
+  )
+
+  useEffect(() => {
+    if (!activeConversation?.id) return
+    requestAnimationFrame(() => {
+      if (messagePaneRef.current) {
+        messagePaneRef.current.scrollTop = messagePaneRef.current.scrollHeight
+      }
+    })
+  }, [activeConversation?.id, activeConversation?.messages.length])
+
+  const updateField = (field, value) => {
+    setSettings((current) => ({ ...current, [field]: value }))
+    setSaved(false)
+  }
+
+  const saveSettings = async () => {
+    await saveAssistantSettings(settings)
+    setSaved(true)
+    window.setTimeout(() => setSaved(false), 2200)
+  }
+
+  const chooseConversation = async (conversationId) => {
+    setActiveConversationId(conversationId)
+    await markAssistantConversationRead(conversationId, 'admin')
+  }
+
+  const sendReply = async (event) => {
+    event.preventDefault()
+    const cleanReply = reply.trim()
+    if (!cleanReply || !activeConversation?.id || sending) return
+
+    setSending(true)
+    try {
+      await addAssistantMessage(activeConversation.id, {
+        sender: 'admin',
+        senderName: settings.adminName,
+        text: cleanReply,
+      })
+      setReply('')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const removeConversation = async (conversationId) => {
+    await deleteAssistantConversation(conversationId)
+    if (activeConversationId === conversationId) {
+      setActiveConversationId(null)
+    }
+  }
+
+  const totalUnread = conversations.reduce(
+    (sum, conversation) => sum + Number(conversation.unreadByAdmin || 0),
+    0,
+  )
+
   return (
-    <div className="management-settings-grid">
-      <section className="management-settings-card">
-        <div className="management-settings-card-header">
-          <h3>معلومات شرکت</h3>
-          <p>معلومات عمومی نمایش‌داده‌شده در وب‌سایت</p>
-        </div>
+    <div className="assistant-admin-layout">
+      <nav className="assistant-settings-tabs" aria-label="بخش‌های تنظیمات دستیار">
+        <button
+          type="button"
+          className={settingsSection === 'assistant-settings' ? 'is-active' : ''}
+          onClick={() => setSettingsSection('assistant-settings')}
+        >
+          <Bot size={17} />
+          تنظیمات دستیار
+        </button>
 
-        <div className="management-form-grid">
-          <label>
-            <span>نام شرکت</span>
-            <input
-              type="text"
-              defaultValue="شرکت رنگ سازی علیمی"
-            />
-          </label>
+        <button
+          type="button"
+          className={settingsSection === 'assistant-messages' ? 'is-active' : ''}
+          onClick={() => setSettingsSection('assistant-messages')}
+        >
+          <MessageSquareText size={17} />
+          پیام‌های دستیار
+          {totalUnread > 0 && <b>{totalUnread}</b>}
+        </button>
+      </nav>
 
-          <label>
-            <span>عنوان کوتاه</span>
-            <input
-              type="text"
-              defaultValue="صنعت رنگ افغانستان"
-            />
-          </label>
+      {settingsSection === 'assistant-settings' && (
+        <section className="management-settings-card assistant-settings-card">
+          <div className="management-settings-card-header assistant-settings-heading">
+            <div>
+              <span className="assistant-settings-icon">
+                <Bot size={22} />
+              </span>
+              <div>
+                <h3>دستیار هوشمند علیمی</h3>
+                <p>نام ادمین، متن‌های دستیار و حالت نمایش آن را مدیریت کنید.</p>
+              </div>
+            </div>
 
-          <label>
-            <span>شماره تماس</span>
-            <input
-              type="text"
-              defaultValue="0700 000 000"
-              dir="ltr"
-            />
-          </label>
+            <label className="assistant-enable-toggle">
+              <input
+                type="checkbox"
+                checked={settings.enabled}
+                onChange={(event) => updateField('enabled', event.target.checked)}
+              />
+              <span />
+              <b>{settings.enabled ? 'فعال' : 'غیرفعال'}</b>
+            </label>
+          </div>
 
-          <label>
-            <span>ایمیل</span>
-            <input
-              type="email"
-              defaultValue="info@alimi.af"
-              dir="ltr"
-            />
-          </label>
+          <div className="management-form-grid assistant-settings-form">
+            <label>
+              <span>نام دستیار</span>
+              <input
+                type="text"
+                value={settings.title}
+                onChange={(event) => updateField('title', event.target.value)}
+              />
+            </label>
 
-          <label className="management-full-field">
-            <span>آدرس</span>
-            <input
-              type="text"
-              defaultValue="کابل، افغانستان"
-            />
-          </label>
+            <label>
+              <span>نام ادمین</span>
+              <input
+                type="text"
+                value={settings.adminName}
+                onChange={(event) => updateField('adminName', event.target.value)}
+                placeholder="مثلاً: احمد - بخش فروش"
+              />
+            </label>
 
-          <label className="management-full-field">
-            <span>درباره شرکت</span>
-            <textarea
-              rows="5"
-              defaultValue="شرکت رنگ سازی علیمی تولیدکننده رنگ‌های ساختمانی و صنعتی با کیفیت پایدار است."
-            />
-          </label>
-        </div>
+            <label>
+              <span>متن حالت آنلاین</span>
+              <input
+                type="text"
+                value={settings.statusText}
+                onChange={(event) => updateField('statusText', event.target.value)}
+              />
+            </label>
 
-        <div className="management-settings-actions">
-          <button type="button" className="management-save-button">
-            ذخیره تغییرات
-          </button>
-        </div>
-      </section>
+            <label>
+              <span>متن داخل کادر پیام</span>
+              <input
+                type="text"
+                value={settings.messagePlaceholder}
+                onChange={(event) =>
+                  updateField('messagePlaceholder', event.target.value)
+                }
+              />
+            </label>
+
+            <label>
+              <span>عنوان درخواست نام کاربر</span>
+              <input
+                type="text"
+                value={settings.namePromptTitle}
+                onChange={(event) =>
+                  updateField('namePromptTitle', event.target.value)
+                }
+              />
+            </label>
+
+            <label>
+              <span>متن داخل کادر نام</span>
+              <input
+                type="text"
+                value={settings.namePlaceholder}
+                onChange={(event) =>
+                  updateField('namePlaceholder', event.target.value)
+                }
+              />
+            </label>
+
+            <label className="management-full-field">
+              <span>توضیح مرحله دریافت نام</span>
+              <textarea
+                rows="3"
+                value={settings.namePromptText}
+                onChange={(event) =>
+                  updateField('namePromptText', event.target.value)
+                }
+              />
+            </label>
+
+            <label className="management-full-field">
+              <span>پیام خوش‌آمدگویی</span>
+              <textarea
+                rows="3"
+                value={settings.welcomeMessage}
+                onChange={(event) =>
+                  updateField('welcomeMessage', event.target.value)
+                }
+              />
+              <small className="assistant-field-help">
+                برای نمایش نام کاربر از <code>{'{name}'}</code> استفاده کنید.
+              </small>
+            </label>
+          </div>
+
+          <div className="management-settings-actions assistant-settings-actions">
+            <button
+              type="button"
+              className="management-save-button"
+              onClick={saveSettings}
+            >
+              {saved ? <CheckCircle2 size={17} /> : <Save size={17} />}
+              {saved ? 'ذخیره شد' : 'ذخیره تنظیمات دستیار'}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {settingsSection === 'assistant-messages' && (
+        <section className="management-settings-card assistant-messages-card">
+          <div className="management-settings-card-header assistant-message-header">
+            <div>
+              <span className="assistant-settings-icon">
+                <MessageSquareText size={22} />
+              </span>
+              <div>
+                <h3>پیام‌های دستیار</h3>
+                <p>گفتگوهای همه کاربران و Browserها را به‌صورت زنده مدیریت کنید.</p>
+              </div>
+            </div>
+
+            <span className="assistant-unread-summary">
+              {totalUnread} پیام خوانده‌نشده
+            </span>
+          </div>
+
+          <div className="assistant-inbox">
+            <aside className="assistant-inbox-list">
+              <label className="assistant-inbox-search">
+                <Search size={16} />
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="جستجو در پیام‌ها..."
+                />
+              </label>
+
+              <div className="assistant-conversation-list">
+                {filteredConversations.length ? (
+                  filteredConversations.map((conversation) => {
+                    const lastMessage = conversation.messages.at(-1)
+                    const hasUnread = Number(conversation.unreadByAdmin || 0) > 0
+                    return (
+                      <button
+                        type="button"
+                        key={conversation.id}
+                        className={
+                          activeConversationId === conversation.id
+                            ? 'assistant-conversation-item is-active'
+                            : 'assistant-conversation-item'
+                        }
+                        onClick={() => chooseConversation(conversation.id)}
+                      >
+                        <span className="assistant-conversation-avatar">
+                          <UserRound size={18} />
+                          {hasUnread && <i className="assistant-profile-online-dot" />}
+                        </span>
+                        <span className="assistant-conversation-copy">
+                          <strong>{conversation.visitorName}</strong>
+                          <small>{lastMessage?.text || 'گفتگوی جدید'}</small>
+                        </span>
+                        <span className="assistant-conversation-meta">
+                          <time>
+                            {new Date(conversation.updatedAt).toLocaleDateString(
+                              'fa-AF',
+                            )}
+                          </time>
+                          {hasUnread && <b>{conversation.unreadByAdmin}</b>}
+                        </span>
+                      </button>
+                    )
+                  })
+                ) : (
+                  <div className="assistant-empty-list">
+                    هنوز پیامی از کاربران دریافت نشده است.
+                  </div>
+                )}
+              </div>
+            </aside>
+
+            <div className="assistant-chat-admin">
+              {activeConversation ? (
+                <>
+                  <header className="assistant-chat-admin-header">
+                    <div>
+                      <span className="assistant-conversation-avatar">
+                        <UserRound size={18} />
+                      </span>
+                      <span>
+                        <strong>{activeConversation.visitorName}</strong>
+                        <small>گفتگوی مستقیم با کاربر</small>
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="assistant-delete-chat"
+                      onClick={() => removeConversation(activeConversation.id)}
+                      title="حذف گفتگو"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </header>
+
+                  <div className="assistant-admin-messages" ref={messagePaneRef}>
+                    {activeConversation.messages.map((item) => {
+                      const fromAdmin = item.sender === 'admin'
+                      return (
+                        <div
+                          key={item.id}
+                          className={
+                            fromAdmin
+                              ? 'assistant-admin-message is-admin'
+                              : 'assistant-admin-message is-user'
+                          }
+                        >
+                          <span>{item.senderName}</span>
+                          <div>{item.text}</div>
+                          <time>
+                            {new Date(item.createdAt).toLocaleTimeString('fa-AF', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </time>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  <form className="assistant-admin-composer" onSubmit={sendReply}>
+                    <textarea
+                      rows="1"
+                      value={reply}
+                      onChange={(event) => setReply(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' && !event.shiftKey) {
+                          event.preventDefault()
+                          sendReply(event)
+                        }
+                      }}
+                      placeholder={`پاسخ به ${activeConversation.visitorName}...`}
+                    />
+                    <button type="submit" disabled={!reply.trim() || sending}>
+                      <Send size={17} />
+                      {sending ? 'در حال ارسال...' : 'ارسال'}
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <div className="assistant-chat-empty">
+                  <MessageSquareText size={38} />
+                  <strong>یک گفتگو را انتخاب کنید</strong>
+                  <p>گفتگوهای دارای نقطه سبز، پیام خوانده‌نشده دارند.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
@@ -424,6 +777,14 @@ function Management() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [assistantSettings, setAssistantSettings] = useState(() =>
+    getAssistantSettings(),
+  )
+
+  useEffect(
+    () => subscribeAssistantStore(() => setAssistantSettings(getAssistantSettings())),
+    [],
+  )
 
   const managementTabs = useMemo(
     () => getManagementTabs(t),
@@ -594,10 +955,10 @@ function Management() {
           </div>
 
           <div className="management-admin-profile">
-            <span className="management-admin-avatar">A</span>
+            <span className="management-admin-avatar">{assistantSettings.adminName?.trim()?.charAt(0) || 'A'}</span>
 
             <span>
-              <strong>مدیر سیستم</strong>
+              <strong>{assistantSettings.adminName || 'مدیر سیستم'}</strong>
               <small>Administrator</small>
             </span>
           </div>

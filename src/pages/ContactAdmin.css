@@ -429,3 +429,12 @@
         flex-direction: column
     }
 }
+.contact-admin-field-hint {
+    margin-top: 7px;
+    display: block;
+    color: var(--management-muted);
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.9;
+    direction: rtl
+}

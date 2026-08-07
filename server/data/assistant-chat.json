@@ -1,0 +1,114 @@
+{
+  "settings": {
+    "enabled": true,
+    "title": "دستیار هوشمند علیمی",
+    "statusText": "آماده پاسخ‌گویی",
+    "adminName": "مدیر علیمی",
+    "namePromptTitle": "قبل از شروع، نام‌تان را بنویسید",
+    "namePromptText": "برای اینکه بتوانیم بهتر پاسخ بدهیم، لطفاً نام خود را وارد کنید.",
+    "namePlaceholder": "نام شما...",
+    "welcomeMessage": "سلام {name}! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+    "messagePlaceholder": "پیام خود را بنویسید..."
+  },
+  "conversations": [
+    {
+      "id": "chat-16747148-2d4d-4a6a-a265-043b941d6490",
+      "visitorName": "مسیح الله",
+      "visitorId": "visitor-186c0950-37e8-4c8b-860a-769e4757340a",
+      "createdAt": 1786114982146,
+      "updatedAt": 1786114984342,
+      "unreadByAdmin": 0,
+      "unreadByUser": 0,
+      "messages": [
+        {
+          "id": "message-f17c3945-a5af-49ed-9514-d4bdbc64c91f",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام مسیح الله! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+          "createdAt": 1786114982146,
+          "system": true
+        },
+        {
+          "id": "message-755fdf10-b0d9-4e2a-b5a6-9761a979fb33",
+          "sender": "user",
+          "senderName": "مسیح الله",
+          "text": "سلام",
+          "createdAt": 1786114984342
+        }
+      ]
+    },
+    {
+      "id": "chat-b684a2c3-4206-4ad9-995b-42c41b8877ef",
+      "visitorName": "محمد",
+      "visitorId": "visitor-9ee708c6-f75c-468f-a8d3-ac3a26b9d439",
+      "createdAt": 1786114925754,
+      "updatedAt": 1786114953880,
+      "unreadByAdmin": 0,
+      "unreadByUser": 0,
+      "messages": [
+        {
+          "id": "message-df06a603-e166-4b07-8fe8-44e45836f4a4",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام محمد! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+          "createdAt": 1786114925754,
+          "system": true
+        },
+        {
+          "id": "message-96640ee8-9e86-46f8-822b-cea894dd2139",
+          "sender": "user",
+          "senderName": "محمد",
+          "text": "سلام علیک",
+          "createdAt": 1786114929074
+        },
+        {
+          "id": "message-fb3d9614-7649-4d81-8a60-6234d030ed49",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "جور استی شاه",
+          "createdAt": 1786114936517
+        },
+        {
+          "id": "message-250db6f1-5b74-4d4a-a64b-66fd7d2ae76b",
+          "sender": "user",
+          "senderName": "محمد",
+          "text": "شکر بابه خودت خوب استی",
+          "createdAt": 1786114953880
+        }
+      ]
+    },
+    {
+      "id": "chat-fb11f133-1561-4fae-9767-92cdba8836bf",
+      "visitorName": "مسیح الله",
+      "visitorId": "visitor-186c0950-37e8-4c8b-860a-769e4757340a",
+      "createdAt": 1786114896870,
+      "updatedAt": 1786114973438,
+      "unreadByAdmin": 0,
+      "unreadByUser": 0,
+      "messages": [
+        {
+          "id": "message-d2e9903d-846e-4d5b-8210-7b6cfb7621dd",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام مسیح الله! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+          "createdAt": 1786114896870,
+          "system": true
+        },
+        {
+          "id": "message-42631fe4-59f4-4f41-839f-0306a8a77c4e",
+          "sender": "user",
+          "senderName": "مسیح الله",
+          "text": "سلام علیک",
+          "createdAt": 1786114901568
+        },
+        {
+          "id": "message-aa42c31f-6e46-4f98-a18d-5e785bceeec3",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "جور استی",
+          "createdAt": 1786114973438
+        }
+      ]
+    }
+  ]
+}

@@ -499,3 +499,166 @@
     display: none;
   }
 }
+/* Dynamic chat additions */
+.alimi-bot-tabs-two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.alimi-bot-name-step {
+  min-height: 0;
+  flex: 1;
+  padding: 34px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--primary) 10%, transparent), transparent 38%),
+    var(--card);
+}
+
+.alimi-bot-name-icon {
+  width: 66px;
+  height: 66px;
+  margin-bottom: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.alimi-bot-name-step h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.alimi-bot-name-step p {
+  max-width: 300px;
+  margin: 8px 0 20px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.9;
+}
+
+.alimi-bot-name-step form {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+}
+
+.alimi-bot-name-step input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  outline: none;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-size: 12px;
+}
+
+.alimi-bot-name-step input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.alimi-bot-name-step button {
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  background: var(--primary);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.alimi-bot-name-step button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.alimi-bot-visitor-bar {
+  min-height: 34px;
+  padding: 7px 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 70%, var(--card));
+  font-size: 9px;
+}
+
+.alimi-bot-visitor-bar strong {
+  color: var(--text);
+}
+
+.alimi-bot-message-name {
+  margin: 0 4px 4px;
+  display: block;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.alimi-bot-message-row.is-user .alimi-bot-message-name {
+  text-align: left;
+}
+
+.alimi-bot-message-row.is-assistant .alimi-bot-message-name {
+  text-align: right;
+}
+
+/* =========================================================
+   Message bubble layout fix
+   ========================================================= */
+.alimi-bot-message-row > div {
+  min-width: 0;
+  max-width: 82%;
+}
+
+.alimi-bot-message-bubble {
+  width: fit-content;
+  min-width: 46px;
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  unicode-bidi: plaintext;
+}
+
+.alimi-bot-message-row.is-user > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.alimi-bot-message-row.is-assistant > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.alimi-bot-message-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 430px) {
+  .alimi-bot-message-row > div {
+    max-width: 86%;
+  }
+
+  .alimi-bot-message-bubble {
+    font-size: 11px;
+    line-height: 1.75;
+  }
+}

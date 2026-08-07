@@ -1067,3 +1067,36 @@
     width: 100%;
   }
 }
+
+/* Real Google map */
+.contact-map-card-live {
+  isolation: isolate;
+}
+
+.contact-google-map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
+  filter: saturate(.9) contrast(.96);
+}
+
+.contact-map-card-live .contact-map-label {
+  z-index: 3;
+  max-width: calc(100% - 36px);
+  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  box-shadow: 0 12px 35px color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+.contact-map-label a {
+  margin-top: 8px;
+  display: inline-flex;
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 800;
+  text-decoration: none;
+}

@@ -48,13 +48,32 @@ function Contact() {
     }
   }, [])
 
+  const activePhones = useMemo(
+    () => [...(pageData.phones || [])]
+      .filter((phone) => phone.active !== false && phone.number)
+      .sort((a, b) => Number(a.order || 0) - Number(b.order || 0)),
+    [pageData.phones],
+  )
+
   const contactItems = useMemo(
-    () =>
-      [...pageData.contactItems]
-        .filter((item) => item.active !== false)
-        .sort((a, b) => Number(a.order || 0) - Number(b.order || 0)),
+    () => [...pageData.contactItems]
+      .filter((item) => item.active !== false)
+      .sort((a, b) => Number(a.order || 0) - Number(b.order || 0)),
     [pageData.contactItems],
   )
+
+  const displayedContactItems = useMemo(() => {
+    const phones = activePhones.map((phone, index) => ({
+      id: phone.id,
+      icon: 'phone',
+      title: phone.label || `شماره تماس ${index + 1}`,
+      value: phone.number,
+      note: phone.note || '',
+      href: `tel:${String(phone.number).replace(/[^+\d]/g, '')}`,
+      order: Number(phone.order || index + 1),
+    }))
+    return [...phones, ...contactItems]
+  }, [activePhones, contactItems])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -69,7 +88,8 @@ function Contact() {
     window.setTimeout(() => setSubmitted(false), 3500)
   }
 
-  const phoneItem = contactItems.find((item) => item.icon === 'phone')
+  const primaryPhone = activePhones[0]
+  const primaryPhoneHref = primaryPhone?.number ? `tel:${String(primaryPhone.number).replace(/[^+\d]/g, '')}` : `tel:${pageData.finalCta.phone}`
   const fields = pageData.formSection.fields
 
   return (
@@ -92,7 +112,7 @@ function Contact() {
                   {pageData.hero.primaryButtonText}<ArrowLeft size={18} />
                 </a>
                 <a
-                  href={phoneItem?.href || `tel:${pageData.finalCta.phone}`}
+                  href={primaryPhoneHref}
                   className="contact-secondary-btn"
                 >
                   {pageData.hero.secondaryButtonText}<Phone size={17} />
@@ -123,7 +143,7 @@ function Contact() {
         <section className="contact-info-section">
           <div className="contact-container">
             <div className="contact-info-grid">
-              {contactItems.map((item, index) => {
+              {displayedContactItems.map((item, index) => {
                 const Icon = iconMap[item.icon] || Phone
                 return (
                   <motion.a
@@ -189,15 +209,31 @@ function Contact() {
 
         <section className="contact-map-section" id="map">
           <div className="contact-container contact-map-layout">
-            <div className="contact-map-card">
-              <div className="contact-map-pattern" aria-hidden="true" />
-              <div className="contact-map-marker"><MapPin size={28} /></div>
-              <span className="contact-map-road contact-road-one" />
-              <span className="contact-map-road contact-road-two" />
-              <span className="contact-map-road contact-road-three" />
+            <div className="contact-map-card contact-map-card-live">
+              {pageData.location.mapEmbedUrl ? (
+                <iframe
+                  className="contact-google-map"
+                  src={pageData.location.mapEmbedUrl}
+                  title={pageData.location.mapTitle || 'Google Map'}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              ) : (
+                <>
+                  <div className="contact-map-pattern" aria-hidden="true" />
+                  <div className="contact-map-marker"><MapPin size={28} /></div>
+                  <span className="contact-map-road contact-road-one" />
+                  <span className="contact-map-road contact-road-two" />
+                  <span className="contact-map-road contact-road-three" />
+                </>
+              )}
               <div className="contact-map-label">
                 <strong>{pageData.location.mapTitle}</strong>
                 <span>{pageData.location.mapAddress}</span>
+                {pageData.location.mapOpenUrl && (
+                  <a href={pageData.location.mapOpenUrl} target="_blank" rel="noreferrer">بازکردن در گوگل مپ</a>
+                )}
               </div>
             </div>
 
@@ -217,7 +253,7 @@ function Contact() {
           <div className="contact-container">
             <div className="contact-final-card">
               <div><span>{pageData.finalCta.kicker}</span><h2>{pageData.finalCta.title}</h2></div>
-              <a href={`tel:${pageData.finalCta.phone}`}>{pageData.finalCta.buttonText}<Phone size={18} /></a>
+              <a href={primaryPhoneHref}>{pageData.finalCta.buttonText}<Phone size={18} /></a>
             </div>
           </div>
         </section>

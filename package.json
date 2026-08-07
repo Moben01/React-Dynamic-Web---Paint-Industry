@@ -7,13 +7,15 @@
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k \"npm run dev:web\" \"npm run assistant:server\"",
     "build": "vite build",
     "preview": "vite preview",
     "electron": "wait-on http://127.0.0.1:5173 && electron .",
     "electron:dev": "concurrently -k \"npm run dev\" \"npm run electron\"",
     "desktop:build": "npm run build && electron-builder --win",
-    "desktop:portable": "npm run build && electron-builder --win portable"
+    "desktop:portable": "npm run build && electron-builder --win portable",
+    "dev:web": "vite --host 0.0.0.0",
+    "assistant:server": "node server/assistant-server.mjs"
   },
   "dependencies": {
     "framer-motion": "latest",
@@ -21,7 +23,7 @@
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "^7.18.2",
-    "sweetalert2": "latest"
+    "sweetalert2": "^11.26.3"
   },
   "devDependencies": {
     "concurrently": "^10.0.4",
@@ -40,7 +42,8 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "package.json"
+      "package.json",
+      "server/**/*"
     ],
     "win": {
       "target": [

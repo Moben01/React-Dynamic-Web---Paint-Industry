@@ -10,6 +10,7 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import Header from './pages/Header'
 import BotAssistant from './pages/BotAssistant'
+import Footer from './components/Footer'
 
 function PublicLayout() {
   return (
@@ -26,6 +27,7 @@ function PublicLayout() {
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
       <BotAssistant />
     </>
   )
