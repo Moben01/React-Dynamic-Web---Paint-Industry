@@ -1,0 +1,431 @@
+.contact-admin {
+    display: grid;
+    gap: 18px
+}
+
+.contact-admin-tabs {
+    padding: 7px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    overflow-x: auto;
+    border: 1px solid var(--management-border);
+    border-radius: 13px;
+    background: var(--management-card)
+}
+
+.contact-admin-tabs button {
+    min-height: 40px;
+    padding: 0 13px;
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: 9px;
+    color: var(--management-muted);
+    background: transparent;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer
+}
+
+.contact-admin-tabs button.active {
+    color: #fff;
+    background: var(--management-primary)
+}
+
+.contact-admin-tabs .contact-admin-reset {
+    margin-right: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--management-danger)
+}
+
+.contact-admin-card {
+    overflow: hidden;
+    border: 1px solid var(--management-border);
+    border-radius: 14px;
+    background: var(--management-card)
+}
+
+.contact-admin-card>header {
+    min-height: 72px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--management-border)
+}
+
+.contact-admin-card h3 {
+    margin: 0;
+    font-size: 14px
+}
+
+.contact-admin-card header p {
+    margin: 5px 0 0;
+    color: var(--management-muted);
+    font-size: 10px
+}
+
+.contact-admin-form-grid {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px
+}
+
+.contact-admin-form-grid label {
+    min-width: 0
+}
+
+.contact-admin-form-grid label>span {
+    margin-bottom: 7px;
+    display: block;
+    color: #555d68;
+    font-size: 10px;
+    font-weight: 800
+}
+
+.contact-admin-form-grid input, .contact-admin-form-grid textarea, .contact-admin-form-grid select {
+    width: 100%;
+    border: 1px solid var(--management-border);
+    border-radius: 9px;
+    outline: 0;
+    background: #fff;
+    font: inherit;
+    font-size: 11px;
+    box-sizing: border-box
+}
+
+.contact-admin-form-grid input, .contact-admin-form-grid select {
+    height: 43px;
+    padding: 0 12px
+}
+
+.contact-admin-form-grid textarea {
+    padding: 11px 12px;
+    resize: vertical
+}
+
+.contact-admin-form-grid input:focus, .contact-admin-form-grid textarea:focus, .contact-admin-form-grid select:focus {
+    border-color: var(--management-primary);
+    box-shadow: 0 0 0 3px rgba(255, 107, 26, .1)
+}
+
+.contact-admin-full {
+    grid-column: 1/-1
+}
+
+.contact-admin-card>footer {
+    padding: 0 20px 20px;
+    display: flex;
+    justify-content: flex-end
+}
+
+.contact-admin-card>footer button, .contact-admin-toolbar>button {
+    min-height: 40px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 0;
+    border-radius: 9px;
+    color: #fff;
+    background: var(--management-primary);
+    font: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer
+}
+
+.contact-admin-toolbar {
+    padding: 14px 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border: 1px solid var(--management-border);
+    border-radius: 13px;
+    background: var(--management-card)
+}
+
+.contact-admin-toolbar strong, .contact-admin-toolbar span {
+    display: block
+}
+
+.contact-admin-toolbar strong {
+    font-size: 13px
+}
+
+.contact-admin-toolbar span {
+    margin-top: 4px;
+    color: var(--management-muted);
+    font-size: 9px
+}
+
+.contact-admin-items-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px
+}
+
+.contact-admin-items-grid article {
+    overflow: hidden;
+    border: 1px solid var(--management-border);
+    border-radius: 14px;
+    background: var(--management-card)
+}
+
+.contact-admin-items-grid article.disabled {
+    opacity: .5
+}
+
+.contact-admin-items-grid small {
+    padding: 17px 17px 0;
+    display: block;
+    color: var(--management-primary);
+    font-weight: 800
+}
+
+.contact-admin-items-grid h3, .contact-admin-items-grid strong, .contact-admin-items-grid p {
+    margin-inline: 17px
+}
+
+.contact-admin-items-grid h3 {
+    margin-top: 8px;
+    margin-bottom: 7px
+}
+
+.contact-admin-items-grid strong {
+    display: block;
+    font-size: 12px
+}
+
+.contact-admin-items-grid p {
+    min-height: 40px;
+    margin-bottom: 17px;
+    color: var(--management-muted);
+    font-size: 10px
+}
+
+.contact-admin-items-grid footer {
+    padding: 10px 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    border-top: 1px solid var(--management-border)
+}
+
+.contact-admin-items-grid footer button {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--management-border);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer
+}
+
+.contact-admin-items-grid footer .danger {
+    color: var(--management-danger)
+}
+
+.contact-admin-messages {
+    display: grid;
+    gap: 12px
+}
+
+.contact-admin-messages>article {
+    padding: 16px;
+    border: 1px solid var(--management-border);
+    border-radius: 13px;
+    background: var(--management-card)
+}
+
+.contact-admin-messages article header, .contact-admin-messages article>div, .contact-admin-messages article footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px
+}
+
+.contact-admin-messages h3 {
+    margin: 0;
+    font-size: 13px
+}
+
+.contact-admin-messages header span, .contact-admin-messages article>div {
+    color: var(--management-muted);
+    font-size: 9px
+}
+
+.contact-admin-messages header b {
+    padding: 6px 10px;
+    border-radius: 20px;
+    color: var(--management-success);
+    background: #e9f7ef;
+    font-size: 9px
+}
+
+.contact-admin-messages article>p {
+    margin: 14px 0;
+    font-size: 11px;
+    line-height: 1.9
+}
+
+.contact-admin-messages article footer {
+    margin-top: 14px;
+    padding-top: 12px;
+    justify-content: flex-end;
+    border-top: 1px solid var(--management-border)
+}
+
+.contact-admin-messages article footer button {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--management-border);
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 9px;
+    font-weight: 800;
+    cursor: pointer
+}
+
+.contact-admin-messages article footer .danger {
+    color: #fff;
+    border-color: var(--management-danger);
+    background: var(--management-danger)
+}
+
+.contact-admin-empty {
+    padding: 35px;
+    border: 1px dashed var(--management-border);
+    border-radius: 13px;
+    color: var(--management-muted);
+    background: var(--management-card);
+    text-align: center;
+    font-size: 11px
+}
+
+.contact-admin-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    padding: 20px;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, .62);
+    backdrop-filter: blur(7px)
+}
+
+.contact-admin-modal {
+    width: min(680px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow: auto;
+    border-radius: 18px;
+    background: #fff
+}
+
+.contact-admin-modal>header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--management-border)
+}
+
+.contact-admin-modal>header h2 {
+    margin: 0;
+    font-size: 17px
+}
+
+.contact-admin-modal>header button {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--management-border);
+    border-radius: 9px;
+    background: #fff
+}
+
+.contact-admin-modal>footer {
+    padding: 13px 20px 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid var(--management-border)
+}
+
+.contact-admin-modal>footer button {
+    min-width: 100px;
+    height: 40px;
+    border: 1px solid var(--management-border);
+    border-radius: 9px;
+    background: #fff;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 800
+}
+
+.contact-admin-modal>footer .primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: #fff;
+    border: 0;
+    background: var(--management-primary)
+}
+
+.contact-admin-checkbox {
+    min-height: 43px;
+    padding: 0 11px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--management-border);
+    border-radius: 9px
+}
+
+.contact-admin-checkbox input {
+    width: 16px;
+    height: 16px
+}
+
+.contact-admin-checkbox span {
+    margin: 0 !important
+}
+
+@media(max-width:1100px) {
+    .contact-admin-items-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+    }
+}
+
+@media(max-width:720px) {
+    .contact-admin-tabs {
+        align-items: stretch;
+        flex-direction: column;
+        overflow: visible
+    }
+
+    .contact-admin-tabs .contact-admin-reset {
+        margin-right: 0
+    }
+
+    .contact-admin-form-grid, .contact-admin-items-grid {
+        grid-template-columns: 1fr
+    }
+
+    .contact-admin-full {
+        grid-column: auto
+    }
+
+    .contact-admin-toolbar, .contact-admin-messages article header, .contact-admin-messages article>div {
+        align-items: stretch;
+        flex-direction: column
+    }
+}

@@ -1,0 +1,68 @@
+.admin-swal-popup {
+  width: min(430px, calc(100vw - 32px)) !important;
+  border-radius: 18px !important;
+  padding: 22px 24px 20px !important;
+  font-family: inherit !important;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.24) !important;
+}
+
+.admin-swal-title {
+  margin: 4px 0 0 !important;
+  color: #171717 !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  line-height: 1.7 !important;
+}
+
+.admin-swal-text {
+  margin: 8px 0 0 !important;
+  color: #666 !important;
+  font-size: 14px !important;
+  line-height: 1.9 !important;
+  text-align: center !important;
+  white-space: pre-line !important;
+}
+
+.admin-swal-actions {
+  width: 100% !important;
+  gap: 10px !important;
+  margin: 20px 0 0 !important;
+}
+
+.admin-swal-confirm,
+.admin-swal-cancel {
+  min-width: 105px;
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 18px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+.admin-swal-confirm:hover,
+.admin-swal-cancel:hover {
+  transform: translateY(-1px);
+}
+
+.admin-swal-confirm {
+  background: #ff6518;
+  color: #fff;
+}
+
+.admin-swal-cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.swal2-icon {
+  margin-top: 4px !important;
+  margin-bottom: 8px !important;
+}
+
+.swal2-timer-progress-bar {
+  background: rgba(255, 101, 24, 0.8) !important;
+}
