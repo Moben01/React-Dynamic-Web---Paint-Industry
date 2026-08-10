@@ -267,6 +267,23 @@
   gap: 10px;
 }
 
+.management-admin-logout {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--management-border);
+  border-radius: 10px;
+  color: var(--management-danger);
+  background: #fff;
+  cursor: pointer;
+}
+
+.management-admin-logout:hover {
+  border-color: rgba(220, 53, 69, 0.24);
+  background: rgba(220, 53, 69, 0.08);
+}
+
 .management-admin-avatar {
   width: 41px;
   height: 41px;
@@ -985,6 +1002,106 @@
     .management-sidebar-open {
     transform: translateX(0);
   }
+}
+
+.admin-login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: #1d2129;
+  background:
+    radial-gradient(circle at top right, rgba(255, 107, 26, 0.14), transparent 34%),
+    #f5f6f8;
+  font-family:
+    'Vazirmatn',
+    Tahoma,
+    Arial,
+    sans-serif;
+}
+
+.admin-login-card {
+  width: min(100%, 430px);
+  padding: 34px;
+  display: grid;
+  gap: 17px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 28px 70px rgba(18, 24, 33, 0.12);
+}
+
+.admin-login-icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: #ffffff;
+  background: #ff6b1a;
+}
+
+.admin-login-card h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.admin-login-card p {
+  margin: -8px 0 4px;
+  color: #747b87;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.admin-login-card label {
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-login-card input {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 11px;
+  color: #1d2129;
+  background: #fff;
+  font: inherit;
+}
+
+.admin-login-card input:focus {
+  outline: 0;
+  border-color: #ff6b1a;
+  box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.12);
+}
+
+.admin-login-error {
+  padding: 11px 13px;
+  border-radius: 10px;
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.08);
+  font-size: 13px;
+}
+
+.admin-login-card button {
+  min-height: 49px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 12px;
+  color: #ffffff;
+  background: #ff6b1a;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-login-card button:hover {
+  background: #e85b0b;
 }
 /* =========================================================
    Dynamic Alimi Assistant — Settings & live inbox

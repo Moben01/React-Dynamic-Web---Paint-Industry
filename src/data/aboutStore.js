@@ -1,4 +1,5 @@
 import { normalizeLocalizedValue } from '../i18n/localizedContent'
+import { hydrateRemoteSection, saveRemoteSection } from './remoteStore'
 
 export const ABOUT_STORAGE_KEY =
   'alimi-about-data-v1'
@@ -450,6 +451,12 @@ export function normalizeAboutData(source) {
 
 export function loadAboutData() {
   try {
+    hydrateRemoteSection(
+      'about',
+      normalizeAboutData,
+      ABOUT_STORAGE_KEY,
+      ABOUT_CHANGED_EVENT,
+    )
     const saved = JSON.parse(
       localStorage.getItem(ABOUT_STORAGE_KEY) || 'null',
     )
@@ -472,6 +479,9 @@ export function saveAboutData(data) {
     ABOUT_STORAGE_KEY,
     JSON.stringify(normalized),
   )
+  saveRemoteSection('about', normalized).catch((error) => {
+    console.warn('About data saved locally; PostgreSQL API unavailable:', error.message)
+  })
 
   window.dispatchEvent(
     new CustomEvent(ABOUT_CHANGED_EVENT, {

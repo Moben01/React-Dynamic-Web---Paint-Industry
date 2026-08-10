@@ -208,3 +208,52 @@ footer { border-top:1px solid var(--line); }
     transform: rotate(360deg);
   }
 }
+
+.scroll-to-top-button {
+  position: fixed;
+  right: 28px;
+  bottom: 112px;
+  z-index: 1150;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--line));
+  border-radius: 50%;
+  color: #fff;
+  background: var(--primary);
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--primary) 26%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px);
+  transition: opacity .2s ease, transform .2s ease, background .2s ease;
+  cursor: pointer;
+}
+
+.scroll-to-top-button.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.scroll-to-top-button:hover {
+  background: color-mix(in srgb, var(--primary) 88%, #000);
+}
+
+[dir="rtl"] .scroll-to-top-button {
+  right: auto;
+  left: 28px;
+}
+
+@media (max-width: 650px) {
+  .scroll-to-top-button {
+    right: 18px;
+    bottom: 104px;
+    width: 44px;
+    height: 44px;
+  }
+
+  [dir="rtl"] .scroll-to-top-button {
+    left: 18px;
+  }
+}

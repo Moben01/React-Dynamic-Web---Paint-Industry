@@ -11,6 +11,7 @@ import Contact from './pages/Contact'
 import Header from './pages/Header'
 import BotAssistant from './pages/BotAssistant'
 import Footer from './components/Footer'
+import ScrollToTopButton from './components/ScrollToTopButton'
 
 function PublicLayout() {
   return (
@@ -28,6 +29,7 @@ function PublicLayout() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />
+      <ScrollToTopButton />
       <BotAssistant />
     </>
   )

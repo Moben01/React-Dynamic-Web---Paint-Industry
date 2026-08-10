@@ -20,6 +20,7 @@
   "dependencies": {
     "framer-motion": "latest",
     "lucide-react": "latest",
+    "pg": "^8.13.1",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "^7.18.2",

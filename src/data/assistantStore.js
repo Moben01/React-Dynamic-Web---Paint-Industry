@@ -76,6 +76,8 @@ function normalizeConversations(rows) {
 
 function apiBase() {
   if (typeof window === 'undefined') return 'http://127.0.0.1:4179/api/assistant'
+  const apiRoot = import.meta?.env?.VITE_API_ROOT
+  if (apiRoot) return `${String(apiRoot).replace(/\/$/, '')}/assistant`
   const configured = import.meta?.env?.VITE_ASSISTANT_API_ROOT
   if (configured) return String(configured).replace(/\/$/, '')
   const host = window.location.hostname || '127.0.0.1'

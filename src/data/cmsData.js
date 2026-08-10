@@ -1,3 +1,5 @@
+import { hydrateRemoteSection, saveRemoteSection, resetRemoteSection } from './remoteStore'
+
 const PREFIX = 'alimi-cms-v3'
 export const CMS_EVENT = 'alimi-cms-updated'
 
@@ -81,6 +83,12 @@ function emit(section, value) { window.dispatchEvent(new CustomEvent(CMS_EVENT, 
 
 export function getCMS(section) {
   try {
+    hydrateRemoteSection(
+      `cms:${section}`,
+      (value) => value,
+      key(section),
+      CMS_EVENT,
+    )
     const raw = localStorage.getItem(key(section))
     return raw === null ? clone(DEFAULT_CMS[section]) : JSON.parse(raw)
   } catch { return clone(DEFAULT_CMS[section]) }
@@ -89,6 +97,9 @@ export function getCMS(section) {
 export function saveCMS(section, value) {
   localStorage.setItem(key(section), JSON.stringify(value))
   emit(section, value)
+  saveRemoteSection(`cms:${section}`, value).catch((error) => {
+    console.warn(`${section} saved locally; PostgreSQL API unavailable:`, error.message)
+  })
   return value
 }
 
@@ -96,6 +107,7 @@ export function resetCMS(section) {
   localStorage.removeItem(key(section))
   const value = clone(DEFAULT_CMS[section])
   emit(section, value)
+  resetRemoteSection(`cms:${section}`).catch(() => {})
   return value
 }
 

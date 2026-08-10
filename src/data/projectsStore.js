@@ -2,6 +2,7 @@ import {
   createLocalizedValue,
   normalizeLocalizedValue,
 } from '../i18n/localizedContent'
+import { hydrateRemoteSection, saveRemoteSection } from './remoteStore'
 
 export const PROJECTS_STORAGE_KEY = 'alimi-projects-data-v1'
 export const PROJECTS_CHANGED_EVENT = 'alimi-projects-data-changed'
@@ -181,6 +182,12 @@ export function normalizeProjectsData(data) {
 
 export function loadProjectsData() {
   try {
+    hydrateRemoteSection(
+      'projects',
+      normalizeProjectsData,
+      PROJECTS_STORAGE_KEY,
+      PROJECTS_CHANGED_EVENT,
+    )
     const saved = JSON.parse(localStorage.getItem(PROJECTS_STORAGE_KEY) || 'null')
     return normalizeProjectsData(saved || clone(defaultProjectsData))
   } catch (error) {
@@ -198,6 +205,9 @@ export function saveProjectsData(data) {
   window.dispatchEvent(
     new CustomEvent(PROJECTS_CHANGED_EVENT, { detail: normalizedData }),
   )
+  saveRemoteSection('projects', normalizedData).catch((error) => {
+    console.warn('Projects saved locally; PostgreSQL API unavailable:', error.message)
+  })
   return normalizedData
 }
 

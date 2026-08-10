@@ -1,4 +1,5 @@
 import { normalizeLocalizedValue } from '../i18n/localizedContent'
+import { hydrateRemoteSection, saveRemoteSection } from './remoteStore'
 
 export const CONTACT_STORAGE_KEY = 'alimi-contact-data-v1'
 export const CONTACT_MESSAGES_STORAGE_KEY = 'alimi-contact-messages-v1'
@@ -228,6 +229,12 @@ const normalizeContactData = (data = defaultContactData) => ({
 
 export function loadContactData() {
   try {
+    hydrateRemoteSection(
+      'contact',
+      normalizeContactData,
+      CONTACT_STORAGE_KEY,
+      CONTACT_CHANGED_EVENT,
+    )
     const saved = JSON.parse(localStorage.getItem(CONTACT_STORAGE_KEY) || 'null')
 
     if (!saved || typeof saved !== 'object') {
@@ -248,6 +255,9 @@ export function saveContactData(data) {
 
   localStorage.setItem(CONTACT_STORAGE_KEY, JSON.stringify(data))
   window.dispatchEvent(new CustomEvent(CONTACT_CHANGED_EVENT, { detail: data }))
+  saveRemoteSection('contact', normalizeContactData(data)).catch((error) => {
+    console.warn('Contact data saved locally; PostgreSQL API unavailable:', error.message)
+  })
   return data
 }
 
@@ -259,6 +269,12 @@ export function resetContactData() {
 
 export function loadContactMessages() {
   try {
+    hydrateRemoteSection(
+      'contactMessages',
+      (value) => (Array.isArray(value) ? value : []),
+      CONTACT_MESSAGES_STORAGE_KEY,
+      CONTACT_MESSAGES_CHANGED_EVENT,
+    )
     const messages = JSON.parse(localStorage.getItem(CONTACT_MESSAGES_STORAGE_KEY) || '[]')
     return Array.isArray(messages) ? messages : []
   } catch {
@@ -269,6 +285,9 @@ export function loadContactMessages() {
 function saveMessages(messages) {
   localStorage.setItem(CONTACT_MESSAGES_STORAGE_KEY, JSON.stringify(messages))
   window.dispatchEvent(new CustomEvent(CONTACT_MESSAGES_CHANGED_EVENT, { detail: messages }))
+  saveRemoteSection('contactMessages', messages).catch((error) => {
+    console.warn('Contact messages saved locally; PostgreSQL API unavailable:', error.message)
+  })
   return messages
 }
 

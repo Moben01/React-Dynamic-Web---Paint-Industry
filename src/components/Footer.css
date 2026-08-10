@@ -24,6 +24,23 @@
   gap: 54px;
 }
 
+.site-footer-brand-logos {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.site-footer-iso-logo {
+  width: 72px;
+  height: 72px;
+  padding: 7px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
 .site-footer-logo-wrap {
   width: 72px;
   height: 72px;

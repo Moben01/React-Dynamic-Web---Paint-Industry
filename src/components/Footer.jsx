@@ -8,6 +8,7 @@ import {
 } from '../data/contactStore'
 import { localizedText } from '../i18n/localizedContent'
 import logo from '../../Assets/logo.png'
+import isoLogo from '../../Assets/iso.jpeg'
 import './Footer.css'
 
 const copy = {
@@ -83,9 +84,16 @@ function Footer() {
       <div className="site-footer-container">
         <div className="site-footer-grid">
           <section className="site-footer-brand-column">
-            <Link to="/" className="site-footer-logo-wrap" aria-label="Alimi Paint Company">
-              <img src={logo} alt="Alimi Paint Company" />
-            </Link>
+            <div className="site-footer-brand-logos">
+              <img
+                className="site-footer-iso-logo"
+                src={isoLogo}
+                alt="ISO"
+              />
+              <Link to="/" className="site-footer-logo-wrap" aria-label="Alimi Paint Company">
+                <img src={logo} alt="Alimi Paint Company" />
+              </Link>
+            </div>
             <p>{labels.about}</p>
           </section>
 

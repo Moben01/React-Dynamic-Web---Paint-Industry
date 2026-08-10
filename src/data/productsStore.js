@@ -2,6 +2,7 @@ import {
   createLocalizedValue,
   normalizeLocalizedValue,
 } from '../i18n/localizedContent'
+import { hydrateRemoteSection, saveRemoteSection } from './remoteStore'
 
 export const PRODUCTS_STORAGE_KEY = 'alimi-products-data-v1'
 export const PRODUCTS_CHANGED_EVENT = 'alimi-products-data-changed'
@@ -285,6 +286,12 @@ export function normalizeProductsData(data) {
 
 export function loadProductsData() {
   try {
+    hydrateRemoteSection(
+      'products',
+      normalizeProductsData,
+      PRODUCTS_STORAGE_KEY,
+      PRODUCTS_CHANGED_EVENT,
+    )
     const saved = JSON.parse(localStorage.getItem(PRODUCTS_STORAGE_KEY) || 'null')
     return normalizeProductsData(saved || clone(defaultProductsData))
   } catch {
@@ -296,6 +303,9 @@ export function saveProductsData(data) {
   const normalized = normalizeProductsData(data)
   localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(normalized))
   window.dispatchEvent(new CustomEvent(PRODUCTS_CHANGED_EVENT, { detail: normalized }))
+  saveRemoteSection('products', normalized).catch((error) => {
+    console.warn('Products saved locally; PostgreSQL API unavailable:', error.message)
+  })
   return normalized
 }
 

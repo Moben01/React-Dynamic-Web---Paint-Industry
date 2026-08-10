@@ -25,6 +25,8 @@ import {
   UserRound,
   CheckCircle2,
   X,
+  LockKeyhole,
+  ShieldCheck,
 } from 'lucide-react'
 
 import DashboardImages from './DashboardImages'
@@ -42,6 +44,13 @@ import {
   saveAssistantSettings,
   subscribeAssistantStore,
 } from '../data/assistantStore'
+import {
+  getAdminAuth,
+  isAdminLoggedIn,
+  saveAdminAuth,
+  setAdminLoggedIn,
+  verifyAdminLogin,
+} from '../data/adminAuth'
 
 import './management.css'
 
@@ -339,6 +348,7 @@ function MessagesTab({ searchTerm }) {
 function SettingsTab() {
   const [settingsSection, setSettingsSection] = useState('assistant-settings')
   const [settings, setSettings] = useState(() => getAssistantSettings())
+  const [adminAuth, setAdminAuth] = useState(() => getAdminAuth())
   const [conversations, setConversations] = useState(() =>
     getAssistantConversations(),
   )
@@ -346,6 +356,7 @@ function SettingsTab() {
   const [search, setSearch] = useState('')
   const [reply, setReply] = useState('')
   const [saved, setSaved] = useState(false)
+  const [authSaved, setAuthSaved] = useState(false)
   const [sending, setSending] = useState(false)
   const messagePaneRef = useRef(null)
   const { language } = useLanguage()
@@ -407,6 +418,17 @@ function SettingsTab() {
     window.setTimeout(() => setSaved(false), 2200)
   }
 
+  const updateAdminAuthField = (field, value) => {
+    setAdminAuth((current) => ({ ...current, [field]: value }))
+    setAuthSaved(false)
+  }
+
+  const saveAdminCredentials = () => {
+    saveAdminAuth(adminAuth)
+    setAuthSaved(true)
+    window.setTimeout(() => setAuthSaved(false), 2200)
+  }
+
   const chooseConversation = async (conversationId) => {
     setActiveConversationId(conversationId)
     await markAssistantConversationRead(conversationId, 'admin')
@@ -462,6 +484,14 @@ function SettingsTab() {
           <MessageSquareText size={17} />
           پیام‌های دستیار
           {totalUnread > 0 && <b>{totalUnread}</b>}
+        </button>
+        <button
+          type="button"
+          className={settingsSection === 'admin-security' ? 'is-active' : ''}
+          onClick={() => setSettingsSection('admin-security')}
+        >
+          <ShieldCheck size={17} />
+          امنیت ادمین
         </button>
       </nav>
 
@@ -735,6 +765,57 @@ function SettingsTab() {
           </div>
         </section>
       )}
+
+      {settingsSection === 'admin-security' && (
+        <section className="management-settings-card admin-security-card">
+          <div className="management-settings-card-header assistant-settings-heading">
+            <div>
+              <span className="assistant-settings-icon">
+                <LockKeyhole size={22} />
+              </span>
+              <div>
+                <h3>ایمیل و پسورد ادمین</h3>
+                <p>برای ورود به صفحه مدیریت، ایمیل و پسورد ادمین را از این بخش تغییر دهید.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="management-form-grid admin-security-form">
+            <label>
+              <span>ایمیل ادمین</span>
+              <input
+                type="email"
+                value={adminAuth.email}
+                onChange={(event) => updateAdminAuthField('email', event.target.value)}
+                placeholder="admin@gmail.com"
+                dir="ltr"
+              />
+            </label>
+
+            <label>
+              <span>پسورد ادمین</span>
+              <input
+                type="text"
+                value={adminAuth.password}
+                onChange={(event) => updateAdminAuthField('password', event.target.value)}
+                placeholder="mynameisadmin"
+                dir="ltr"
+              />
+            </label>
+          </div>
+
+          <div className="management-settings-actions assistant-settings-actions">
+            <button
+              type="button"
+              className="management-save-button"
+              onClick={saveAdminCredentials}
+            >
+              {authSaved ? <CheckCircle2 size={17} /> : <Save size={17} />}
+              {authSaved ? 'ذخیره شد' : 'ذخیره ایمیل و پسورد'}
+            </button>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
@@ -764,6 +845,67 @@ function ManagementTable({ columns, children }) {
   )
 }
 
+function AdminLogin({ direction, onLogin }) {
+  const [email, setEmail] = useState('admin@gmail.com')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+
+  const submitLogin = (event) => {
+    event.preventDefault()
+    if (!verifyAdminLogin(email, password)) {
+      setError('ایمیل یا پسورد درست نیست.')
+      return
+    }
+    setAdminLoggedIn(true)
+    setError('')
+    onLogin()
+  }
+
+  return (
+    <main className="admin-login-page" dir={direction}>
+      <form className="admin-login-card" onSubmit={submitLogin}>
+        <span className="admin-login-icon">
+          <LockKeyhole size={28} />
+        </span>
+        <h1>ورود به ادمین</h1>
+        <p>برای مدیریت سایت، ایمیل و پسورد ادمین را وارد کنید.</p>
+
+        <label>
+          <span>ایمیل</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="admin@gmail.com"
+            dir="ltr"
+            autoComplete="username"
+            autoFocus
+          />
+        </label>
+
+        <label>
+          <span>پسورد</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="mynameisadmin"
+            dir="ltr"
+            autoComplete="current-password"
+          />
+        </label>
+
+        {error && <strong className="admin-login-error">{error}</strong>}
+
+        <button type="submit">
+          <ShieldCheck size={18} />
+          ورود
+        </button>
+      </form>
+    </main>
+  )
+}
+
 function Management() {
   const {
     direction,
@@ -775,6 +917,7 @@ function Management() {
   } = useLanguage()
 
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [authenticated, setAuthenticated] = useState(() => isAdminLoggedIn())
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [assistantSettings, setAssistantSettings] = useState(() =>
@@ -799,6 +942,21 @@ function Management() {
   )
 
   const ActiveTabIcon = activeTabInformation.icon
+
+  if (!authenticated) {
+    return (
+      <AdminLogin
+        direction={direction}
+        onLogin={() => setAuthenticated(true)}
+      />
+    )
+  }
+
+  const logoutAdmin = () => {
+    setAdminLoggedIn(false)
+    setAuthenticated(false)
+    setSidebarOpen(false)
+  }
 
   const changeTab = (tabId) => {
     setActiveTab(tabId)
@@ -961,6 +1119,16 @@ function Management() {
               <strong>{assistantSettings.adminName || 'مدیر سیستم'}</strong>
               <small>Administrator</small>
             </span>
+
+            <button
+              type="button"
+              className="management-admin-logout"
+              onClick={logoutAdmin}
+              title="خروج از ادمین"
+              aria-label="خروج از ادمین"
+            >
+              <LogOut size={17} />
+            </button>
           </div>
         </header>
 
