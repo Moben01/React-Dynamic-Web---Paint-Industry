@@ -32,6 +32,7 @@ import ProjectsAdmin from './ProjectsAdmin'
 import ProductsAdmin from './ProductsAdmin'
 import AboutAdmin from './AboutAdmin'
 import ContactAdmin from './ContactAdmin'
+import LocalizedField from '../components/LocalizedField'
 import {
   addAssistantMessage,
   deleteAssistantConversation,
@@ -347,6 +348,7 @@ function SettingsTab() {
   const [saved, setSaved] = useState(false)
   const [sending, setSending] = useState(false)
   const messagePaneRef = useRef(null)
+  const { language } = useLanguage()
 
   const refreshAssistantData = () => {
     setSettings(getAssistantSettings())
@@ -488,14 +490,12 @@ function SettingsTab() {
           </div>
 
           <div className="management-form-grid assistant-settings-form">
-            <label>
-              <span>نام دستیار</span>
-              <input
-                type="text"
-                value={settings.title}
-                onChange={(event) => updateField('title', event.target.value)}
-              />
-            </label>
+            <LocalizedField
+              label="نام دستیار"
+              value={settings.title}
+              onChange={(value) => updateField('title', value)}
+              showTranslationActions={false}
+            />
 
             <label>
               <span>نام ادمین</span>
@@ -507,74 +507,59 @@ function SettingsTab() {
               />
             </label>
 
-            <label>
-              <span>متن حالت آنلاین</span>
-              <input
-                type="text"
-                value={settings.statusText}
-                onChange={(event) => updateField('statusText', event.target.value)}
-              />
-            </label>
+            <LocalizedField
+              label="متن حالت آنلاین"
+              value={settings.statusText}
+              onChange={(value) => updateField('statusText', value)}
+              showTranslationActions={false}
+            />
 
-            <label>
-              <span>متن داخل کادر پیام</span>
-              <input
-                type="text"
-                value={settings.messagePlaceholder}
-                onChange={(event) =>
-                  updateField('messagePlaceholder', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              label="متن داخل کادر پیام"
+              value={settings.messagePlaceholder}
+              onChange={(value) => updateField('messagePlaceholder', value)}
+              showTranslationActions={false}
+            />
 
-            <label>
-              <span>عنوان درخواست نام کاربر</span>
-              <input
-                type="text"
-                value={settings.namePromptTitle}
-                onChange={(event) =>
-                  updateField('namePromptTitle', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              label="عنوان درخواست نام کاربر"
+              value={settings.namePromptTitle}
+              onChange={(value) => updateField('namePromptTitle', value)}
+              showTranslationActions={false}
+            />
 
-            <label>
-              <span>متن داخل کادر نام</span>
-              <input
-                type="text"
-                value={settings.namePlaceholder}
-                onChange={(event) =>
-                  updateField('namePlaceholder', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              label="متن داخل کادر نام"
+              value={settings.namePlaceholder}
+              onChange={(value) => updateField('namePlaceholder', value)}
+              showTranslationActions={false}
+            />
 
-            <label className="management-full-field">
-              <span>توضیح مرحله دریافت نام</span>
-              <textarea
-                rows="3"
+            <div className="management-full-field">
+              <LocalizedField
+                label="توضیح مرحله دریافت نام"
                 value={settings.namePromptText}
-                onChange={(event) =>
-                  updateField('namePromptText', event.target.value)
-                }
+                onChange={(value) => updateField('namePromptText', value)}
+                multiline
+                rows={3}
+                showTranslationActions={false}
               />
-            </label>
+            </div>
 
-            <label className="management-full-field">
-              <span>پیام خوش‌آمدگویی</span>
-              <textarea
-                rows="3"
+            <div className="management-full-field">
+              <LocalizedField
+                label="پیام خوش‌آمدگویی"
                 value={settings.welcomeMessage}
-                onChange={(event) =>
-                  updateField('welcomeMessage', event.target.value)
-                }
+                onChange={(value) => updateField('welcomeMessage', value)}
+                multiline
+                rows={3}
+                showTranslationActions={false}
               />
               <small className="assistant-field-help">
                 برای نمایش نام کاربر از <code>{'{name}'}</code> استفاده کنید.
               </small>
-            </label>
+            </div>
           </div>
-
           <div className="management-settings-actions assistant-settings-actions">
             <button
               type="button"
@@ -688,6 +673,7 @@ function SettingsTab() {
                   <div className="assistant-admin-messages" ref={messagePaneRef}>
                     {activeConversation.messages.map((item) => {
                       const fromAdmin = item.sender === 'admin'
+                      const productImage = extractAssistantProductImage(item.text)
                       return (
                         <div
                           key={item.id}
@@ -698,7 +684,16 @@ function SettingsTab() {
                           }
                         >
                           <span>{item.senderName}</span>
-                          <div>{item.text}</div>
+                          <div>
+                            {item.text}
+                            {productImage && (
+                              <img
+                                className="assistant-admin-product-image"
+                                src={productImage}
+                                alt=""
+                              />
+                            )}
+                          </div>
                           <time>
                             {new Date(item.createdAt).toLocaleTimeString('fa-AF', {
                               hour: '2-digit',
@@ -742,6 +737,11 @@ function SettingsTab() {
       )}
     </div>
   )
+}
+
+function extractAssistantProductImage(text) {
+  const match = String(text || '').match(/عکس محصول:\s*(\S+)/)
+  return match?.[1] || ''
 }
 
 function ManagementTable({ columns, children }) {

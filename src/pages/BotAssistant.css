@@ -244,6 +244,17 @@
   border-radius: 14px;
   font-size: 10px;
   line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.alimi-bot-message-product-image {
+  width: 100%;
+  max-width: 190px;
+  max-height: 150px;
+  margin-top: 8px;
+  display: block;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
 .alimi-bot-message-row.is-user .alimi-bot-message-bubble {
@@ -263,10 +274,60 @@
   padding: 6px;
   flex: 0 0 auto;
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   gap: 7px;
   border: 1px solid var(--line);
   border-radius: 14px;
+  background: var(--surface);
+}
+
+.alimi-bot-product-attachment {
+  width: 100%;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--card);
+}
+
+.alimi-bot-product-attachment img {
+  width: 48px;
+  height: 42px;
+  display: block;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.alimi-bot-product-attachment span,
+.alimi-bot-product-attachment strong,
+.alimi-bot-product-attachment small {
+  min-width: 0;
+  display: block;
+}
+
+.alimi-bot-product-attachment strong {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alimi-bot-product-attachment small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.alimi-bot-composer .alimi-bot-product-attachment button {
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  flex: 0 0 28px;
+  color: var(--muted);
   background: var(--surface);
 }
 

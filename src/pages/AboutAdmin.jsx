@@ -21,6 +21,11 @@ import {
   showAdminSuccess,
   showAdminWarning,
 } from '../utils/adminAlert'
+import LocalizedField from '../components/LocalizedField'
+import {
+  localizedText,
+  normalizeLocalizedValue,
+} from '../i18n/localizedContent'
 import './AboutAdmin.css'
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024
@@ -176,9 +181,9 @@ function AboutAdmin() {
           ...current.story.timeline,
           {
             id: `timeline-${Date.now()}`,
-            year: '',
-            title: '',
-            description: '',
+            year: normalizeLocalizedValue(''),
+            title: normalizeLocalizedValue(''),
+            description: normalizeLocalizedValue(''),
           },
         ],
       },
@@ -226,7 +231,7 @@ function AboutAdmin() {
           ...current.factory.checklist,
           {
             id: `factory-item-${Date.now()}`,
-            text: '',
+            text: normalizeLocalizedValue(''),
           },
         ],
       },
@@ -304,7 +309,7 @@ function AboutAdmin() {
         const next = prepared.map((url, index) => ({
           id: `about-bg-${Date.now()}-${index}`,
           url,
-          alt: `پس‌زمینه درباره ما ${currentImages.length + index + 1}`,
+          alt: normalizeLocalizedValue(`پس‌زمینه درباره ما ${currentImages.length + index + 1}`),
           active: true,
           order: currentImages.length + index + 1,
         }))
@@ -340,7 +345,7 @@ function AboutAdmin() {
             {
               id: `about-bg-url-${Date.now()}`,
               url,
-              alt: `پس‌زمینه درباره ما ${currentImages.length + 1}`,
+              alt: normalizeLocalizedValue(`پس‌زمینه درباره ما ${currentImages.length + 1}`),
               active: true,
               order: currentImages.length + 1,
             },
@@ -405,8 +410,8 @@ function AboutAdmin() {
     setValueDraft({
       id: '',
       icon: 'shield',
-      title: '',
-      description: '',
+      title: normalizeLocalizedValue(''),
+      description: normalizeLocalizedValue(''),
       active: true,
       order: data.values.length + 1,
     })
@@ -421,7 +426,7 @@ function AboutAdmin() {
   const saveValue = (event) => {
     event.preventDefault()
 
-    if (!valueDraft.title.trim()) {
+    if (!localizedText(valueDraft.title, 'fa').trim()) {
       showAdminWarning('عنوان ارزش الزامی است.')
       return
     }
@@ -431,9 +436,8 @@ function AboutAdmin() {
       id:
         valueDraft.id ||
         `value-${Date.now()}`,
-      title: valueDraft.title.trim(),
-      description:
-        valueDraft.description.trim(),
+      title: normalizeLocalizedValue(valueDraft.title),
+      description: normalizeLocalizedValue(valueDraft.description),
       order:
         Number(valueDraft.order) ||
         data.values.length + 1,
@@ -467,8 +471,8 @@ function AboutAdmin() {
     const value = data.values.find((item) => item.id === id)
     const confirmed = await confirmAdminAction({
       title: 'حذف ارزش',
-      text: value?.title
-        ? `آیا «${value.title}» حذف شود؟ این عمل قابل برگشت نیست.`
+      text: localizedText(value?.title, 'fa')
+        ? `آیا «${localizedText(value.title, 'fa')}» حذف شود؟ این عمل قابل برگشت نیست.`
         : 'این ارزش حذف شود؟ این عمل قابل برگشت نیست.',
       confirmText: 'حذف',
       cancelText: 'انصراف',
@@ -569,56 +573,15 @@ function AboutAdmin() {
           </header>
 
           <div className="about-admin-form-grid">
-            <label>
-              <span>نوشته کوچک بالا</span>
-              <input
-                value={data.intro.kicker}
-                onChange={(event) =>
-                  updateSection('intro', 'kicker', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField label="نوشته کوچک بالا" value={data.intro.kicker} onChange={(value) => updateSection('intro', 'kicker', value)} showTranslationActions={false} />
 
-            <label>
-              <span>قسمت اول عنوان</span>
-              <input
-                value={data.intro.title}
-                onChange={(event) =>
-                  updateSection('intro', 'title', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField label="قسمت اول عنوان" value={data.intro.title} onChange={(value) => updateSection('intro', 'title', value)} showTranslationActions={false} />
 
-            <label>
-              <span>قسمت رنگی عنوان</span>
-              <input
-                value={data.intro.highlight}
-                onChange={(event) =>
-                  updateSection('intro', 'highlight', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField label="قسمت رنگی عنوان" value={data.intro.highlight} onChange={(value) => updateSection('intro', 'highlight', value)} showTranslationActions={false} />
 
-            <label>
-              <span>متن دکمه</span>
-              <input
-                value={data.intro.buttonText}
-                onChange={(event) =>
-                  updateSection('intro', 'buttonText', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField label="متن دکمه" value={data.intro.buttonText} onChange={(value) => updateSection('intro', 'buttonText', value)} showTranslationActions={false} />
 
-            <label className="about-admin-full">
-              <span>توضیحات</span>
-              <textarea
-                rows="4"
-                value={data.intro.description}
-                onChange={(event) =>
-                  updateSection('intro', 'description', event.target.value)
-                }
-              />
-            </label>
+            <div className="about-admin-full"><LocalizedField label="توضیحات" value={data.intro.description} onChange={(value) => updateSection('intro', 'description', value)} multiline rows={4} showTranslationActions={false} /></div>
 
             <label>
               <span>زمان تغییر هر عکس</span>
@@ -685,18 +648,17 @@ function AboutAdmin() {
                   key={item.id || `${item.url}-${index}`}
                 >
                   <div className="about-bg-preview">
-                    <img src={item.url} alt={item.alt || `پس‌زمینه ${index + 1}`} />
+                    <img src={item.url} alt={localizedText(item.alt, 'fa') || `پس‌زمینه ${index + 1}`} />
                     <span>{String(index + 1).padStart(2, '0')}</span>
                   </div>
 
                   <div className="about-bg-item-body">
-                    <label>
-                      <span>متن Alt</span>
-                      <input
-                        value={item.alt || ''}
-                        onChange={(event) => updateBackgroundAlt(item.id, event.target.value)}
-                      />
-                    </label>
+                    <LocalizedField
+                      label="متن جایگزین عکس (Alt)"
+                      value={item.alt}
+                      onChange={(value) => updateBackgroundAlt(item.id, value)}
+                      showTranslationActions={false}
+                    />
 
                     <div className="about-bg-actions">
                       <button
@@ -741,34 +703,8 @@ function AboutAdmin() {
           </header>
 
           <div className="about-admin-form-grid">
-            <label>
-              <span>نوشته کوچک</span>
-              <input
-                value={data.vision.kicker}
-                onChange={(event) =>
-                  updateSection(
-                    'vision',
-                    'kicker',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
-
-            <label className="about-admin-full">
-              <span>عنوان دیدگاه</span>
-              <textarea
-                rows="3"
-                value={data.vision.title}
-                onChange={(event) =>
-                  updateSection(
-                    'vision',
-                    'title',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <LocalizedField label="نوشته کوچک" value={data.vision.kicker} onChange={(value) => updateSection('vision', 'kicker', value)} showTranslationActions={false} />
+            <div className="about-admin-full"><LocalizedField label="عنوان دیدگاه" value={data.vision.title} onChange={(value) => updateSection('vision', 'title', value)} multiline rows={3} showTranslationActions={false} /></div>
           </div>
 
           <div className="about-admin-stats">
@@ -779,33 +715,9 @@ function AboutAdmin() {
                     آمار {index + 1}
                   </strong>
 
-                  <label>
-                    <span>مقدار</span>
-                    <input
-                      value={stat.value}
-                      onChange={(event) =>
-                        updateVisionStat(
-                          index,
-                          'value',
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </label>
+                  <LocalizedField label="مقدار" value={stat.value} onChange={(value) => updateVisionStat(index, 'value', value)} showTranslationActions={false} />
 
-                  <label>
-                    <span>عنوان</span>
-                    <input
-                      value={stat.label}
-                      onChange={(event) =>
-                        updateVisionStat(
-                          index,
-                          'label',
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </label>
+                  <LocalizedField label="عنوان" value={stat.label} onChange={(value) => updateVisionStat(index, 'label', value)} showTranslationActions={false} />
                 </article>
               ),
             )}
@@ -837,62 +749,13 @@ function AboutAdmin() {
           </header>
 
           <div className="about-admin-form-grid">
-            <label>
-              <span>نوشته کوچک</span>
-              <input
-                value={data.story.kicker}
-                onChange={(event) =>
-                  updateSection(
-                    'story',
-                    'kicker',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <LocalizedField label="نوشته کوچک" value={data.story.kicker} onChange={(value) => updateSection('story', 'kicker', value)} showTranslationActions={false} />
 
-            <label>
-              <span>قسمت اول عنوان</span>
-              <input
-                value={data.story.title}
-                onChange={(event) =>
-                  updateSection(
-                    'story',
-                    'title',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <LocalizedField label="قسمت اول عنوان" value={data.story.title} onChange={(value) => updateSection('story', 'title', value)} showTranslationActions={false} />
 
-            <label>
-              <span>قسمت رنگی عنوان</span>
-              <input
-                value={data.story.highlight}
-                onChange={(event) =>
-                  updateSection(
-                    'story',
-                    'highlight',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <LocalizedField label="قسمت رنگی عنوان" value={data.story.highlight} onChange={(value) => updateSection('story', 'highlight', value)} showTranslationActions={false} />
 
-            <label className="about-admin-full">
-              <span>توضیحات</span>
-              <textarea
-                rows="4"
-                value={data.story.description}
-                onChange={(event) =>
-                  updateSection(
-                    'story',
-                    'description',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <div className="about-admin-full"><LocalizedField label="توضیحات" value={data.story.description} onChange={(value) => updateSection('story', 'description', value)} multiline rows={4} showTranslationActions={false} /></div>
           </div>
 
           <div className="about-admin-repeat-list">
@@ -914,48 +777,11 @@ function AboutAdmin() {
                     </button>
                   </div>
 
-                  <label>
-                    <span>سال</span>
-                    <input
-                      value={item.year}
-                      onChange={(event) =>
-                        updateTimeline(
-                          index,
-                          'year',
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </label>
+                  <LocalizedField label="سال" value={item.year} onChange={(value) => updateTimeline(index, 'year', value)} showTranslationActions={false} />
 
-                  <label>
-                    <span>عنوان</span>
-                    <input
-                      value={item.title}
-                      onChange={(event) =>
-                        updateTimeline(
-                          index,
-                          'title',
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </label>
+                  <LocalizedField label="عنوان" value={item.title} onChange={(value) => updateTimeline(index, 'title', value)} showTranslationActions={false} />
 
-                  <label className="wide">
-                    <span>توضیحات</span>
-                    <textarea
-                      rows="3"
-                      value={item.description}
-                      onChange={(event) =>
-                        updateTimeline(
-                          index,
-                          'description',
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </label>
+                  <LocalizedField label="توضیحات" value={item.description} onChange={(value) => updateTimeline(index, 'description', value)} multiline rows={3} showTranslationActions={false} />
                 </article>
               ),
             )}
@@ -980,72 +806,13 @@ function AboutAdmin() {
             </header>
 
             <div className="about-admin-form-grid">
-              <label>
-                <span>نوشته کوچک</span>
-                <input
-                  value={
-                    data.valuesSection.kicker
-                  }
-                  onChange={(event) =>
-                    updateSection(
-                      'valuesSection',
-                      'kicker',
-                      event.target.value,
-                    )
-                  }
-                />
-              </label>
+              <LocalizedField label="نوشته کوچک" value={data.valuesSection.kicker} onChange={(value) => updateSection('valuesSection', 'kicker', value)} showTranslationActions={false} />
 
-              <label>
-                <span>قسمت اول عنوان</span>
-                <input
-                  value={
-                    data.valuesSection.title
-                  }
-                  onChange={(event) =>
-                    updateSection(
-                      'valuesSection',
-                      'title',
-                      event.target.value,
-                    )
-                  }
-                />
-              </label>
+              <LocalizedField label="قسمت اول عنوان" value={data.valuesSection.title} onChange={(value) => updateSection('valuesSection', 'title', value)} showTranslationActions={false} />
 
-              <label>
-                <span>قسمت رنگی عنوان</span>
-                <input
-                  value={
-                    data.valuesSection
-                      .highlight
-                  }
-                  onChange={(event) =>
-                    updateSection(
-                      'valuesSection',
-                      'highlight',
-                      event.target.value,
-                    )
-                  }
-                />
-              </label>
+              <LocalizedField label="قسمت رنگی عنوان" value={data.valuesSection.highlight} onChange={(value) => updateSection('valuesSection', 'highlight', value)} showTranslationActions={false} />
 
-              <label className="about-admin-full">
-                <span>توضیحات</span>
-                <textarea
-                  rows="3"
-                  value={
-                    data.valuesSection
-                      .description
-                  }
-                  onChange={(event) =>
-                    updateSection(
-                      'valuesSection',
-                      'description',
-                      event.target.value,
-                    )
-                  }
-                />
-              </label>
+              <div className="about-admin-full"><LocalizedField label="توضیحات" value={data.valuesSection.description} onChange={(value) => updateSection('valuesSection', 'description', value)} multiline rows={3} showTranslationActions={false} /></div>
             </div>
 
             <SaveFooter
@@ -1089,8 +856,8 @@ function AboutAdmin() {
                   }
                 >
                   <small>{item.icon}</small>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
+                  <h3>{localizedText(item.title, 'fa')}</h3>
+                  <p>{localizedText(item.description, 'fa')}</p>
 
                   <footer>
                     <button
@@ -1187,89 +954,19 @@ function AboutAdmin() {
             />
 
             <div className="about-admin-form-grid">
-              <label>
-                <span>نوشته کوچک</span>
-                <input
-                  value={data.factory.kicker}
-                  onChange={(event) =>
-                    updateSection(
-                      'factory',
-                      'kicker',
-                      event.target.value,
-                    )
-                  }
-                />
-              </label>
+              <LocalizedField label="نوشته کوچک" value={data.factory.kicker} onChange={(value) => updateSection('factory', 'kicker', value)} showTranslationActions={false} />
 
-              <label>
-                <span>قسمت اول عنوان</span>
-                <input
-                  value={data.factory.title}
-                  onChange={(event) =>
-                    updateSection(
-                      'factory',
-                      'title',
-                      event.target.value,
-                    )
-                  }
-                />
-              </label>
+              <LocalizedField label="قسمت اول عنوان" value={data.factory.title} onChange={(value) => updateSection('factory', 'title', value)} showTranslationActions={false} />
 
-              <label>
-                <span>قسمت رنگی عنوان</span>
-                <input
-                  value={
-                    data.factory.highlight
-                  }
-                  onChange={(event) =>
-                    updateSection(
-                      'factory',
-                      'highlight',
-                      event.target.value,
-                    )
-                  }
-                />
-              </label>
+              <LocalizedField label="قسمت رنگی عنوان" value={data.factory.highlight} onChange={(value) => updateSection('factory', 'highlight', value)} showTranslationActions={false} />
 
-              <label className="about-admin-full">
-                <span>توضیحات</span>
-                <textarea
-                  rows="4"
-                  value={
-                    data.factory.description
-                  }
-                  onChange={(event) =>
-                    updateSection(
-                      'factory',
-                      'description',
-                      event.target.value,
-                    )
-                  }
-                />
-              </label>
+              <div className="about-admin-full"><LocalizedField label="توضیحات" value={data.factory.description} onChange={(value) => updateSection('factory', 'description', value)} multiline rows={4} showTranslationActions={false} /></div>
 
               {data.factory.checklist.map(
                 (item, index) => (
-                  <label
-                    key={item.id}
-                    className="about-admin-check-row about-admin-full"
-                  >
-                    <span>
-                      مورد {index + 1}
-                    </span>
-
-                    <div>
-                      <input
-                        value={item.text}
-                        onChange={(event) =>
-                          updateChecklist(
-                            index,
-                            event.target.value,
-                          )
-                        }
-                      />
-
-                      <button
+                  <div key={item.id} className="about-admin-check-row about-admin-full about-admin-localized-row">
+                    <LocalizedField label={`مورد ${index + 1}`} value={item.text} onChange={(value) => updateChecklist(index, value)} showTranslationActions={false} />
+                    <button
                         type="button"
                         onClick={() =>
                           removeChecklist(item.id)
@@ -1277,8 +974,7 @@ function AboutAdmin() {
                       >
                         <Trash2 size={15} />
                       </button>
-                    </div>
-                  </label>
+                  </div>
                 ),
               )}
             </div>
@@ -1302,47 +998,11 @@ function AboutAdmin() {
           </header>
 
           <div className="about-admin-form-grid">
-            <label>
-              <span>نوشته کوچک</span>
-              <input
-                value={data.contact.kicker}
-                onChange={(event) =>
-                  updateSection(
-                    'contact',
-                    'kicker',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <LocalizedField label="نوشته کوچک" value={data.contact.kicker} onChange={(value) => updateSection('contact', 'kicker', value)} showTranslationActions={false} />
 
-            <label>
-              <span>عنوان</span>
-              <input
-                value={data.contact.title}
-                onChange={(event) =>
-                  updateSection(
-                    'contact',
-                    'title',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <LocalizedField label="عنوان" value={data.contact.title} onChange={(value) => updateSection('contact', 'title', value)} showTranslationActions={false} />
 
-            <label>
-              <span>متن دکمه</span>
-              <input
-                value={data.contact.buttonText}
-                onChange={(event) =>
-                  updateSection(
-                    'contact',
-                    'buttonText',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <LocalizedField label="متن دکمه" value={data.contact.buttonText} onChange={(value) => updateSection('contact', 'buttonText', value)} showTranslationActions={false} />
 
             <label>
               <span>شماره تماس</span>
@@ -1359,22 +1019,7 @@ function AboutAdmin() {
               />
             </label>
 
-            <label className="about-admin-full">
-              <span>توضیحات</span>
-              <textarea
-                rows="4"
-                value={
-                  data.contact.description
-                }
-                onChange={(event) =>
-                  updateSection(
-                    'contact',
-                    'description',
-                    event.target.value,
-                  )
-                }
-              />
-            </label>
+            <div className="about-admin-full"><LocalizedField label="توضیحات" value={data.contact.description} onChange={(value) => updateSection('contact', 'description', value)} multiline rows={4} showTranslationActions={false} /></div>
           </div>
 
           <SaveFooter
@@ -1412,21 +1057,7 @@ function AboutAdmin() {
             </header>
 
             <div className="about-admin-form-grid">
-              <label>
-                <span>عنوان *</span>
-                <input
-                  value={valueDraft.title}
-                  onChange={(event) =>
-                    setValueDraft(
-                      (current) => ({
-                        ...current,
-                        title:
-                          event.target.value,
-                      }),
-                    )
-                  }
-                />
-              </label>
+              <LocalizedField label="عنوان" required value={valueDraft.title} onChange={(value) => setValueDraft((current) => ({ ...current, title: value }))} showTranslationActions={false} />
 
               <label>
                 <span>آیکن</span>
@@ -1492,24 +1123,7 @@ function AboutAdmin() {
                 <span>فعال باشد</span>
               </label>
 
-              <label className="about-admin-full">
-                <span>توضیحات</span>
-                <textarea
-                  rows="4"
-                  value={
-                    valueDraft.description
-                  }
-                  onChange={(event) =>
-                    setValueDraft(
-                      (current) => ({
-                        ...current,
-                        description:
-                          event.target.value,
-                      }),
-                    )
-                  }
-                />
-              </label>
+              <div className="about-admin-full"><LocalizedField label="توضیحات" value={valueDraft.description} onChange={(value) => setValueDraft((current) => ({ ...current, description: value }))} multiline rows={4} showTranslationActions={false} /></div>
             </div>
 
 
@@ -1556,7 +1170,7 @@ function ImageEditor({
         }
       >
         {value ? (
-          <img src={value} alt={alt || title} />
+          <img src={value} alt={localizedText(alt, 'fa') || title} />
         ) : (
           <span>
             <ImagePlus size={30} />
@@ -1584,15 +1198,12 @@ function ImageEditor({
         />
       </label>
 
-      <label>
-        <span>متن Alt</span>
-        <input
-          value={alt}
-          onChange={(event) =>
-            onAlt(event.target.value)
-          }
-        />
-      </label>
+      <LocalizedField
+        label="متن جایگزین تصویر (Alt)"
+        value={alt}
+        onChange={onAlt}
+        showTranslationActions={false}
+      />
     </article>
   )
 }

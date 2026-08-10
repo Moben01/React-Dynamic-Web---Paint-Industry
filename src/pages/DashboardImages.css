@@ -540,3 +540,135 @@
     color: #fff;
     background: #dc2626
 }
+
+/* =========================
+   Three-language fields
+========================= */
+.dashboard-admin-localized-grid .localized-field,
+.dashboard-images-fields .localized-field {
+    min-width: 0;
+    display: grid;
+    gap: 8px;
+}
+
+.dashboard-admin-localized-grid .localized-field.is-full {
+    grid-column: 1 / -1;
+}
+
+.dashboard-admin-localized-grid .localized-field-heading,
+.dashboard-images-fields .localized-field-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.dashboard-admin-localized-grid .localized-field-heading > span,
+.dashboard-images-fields .localized-field-heading > span {
+    margin: 0;
+    color: var(--text);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.dashboard-admin-localized-grid .localized-field-tabs,
+.dashboard-images-fields .localized-field-tabs {
+    padding: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+}
+
+.dashboard-admin-localized-grid .localized-field-tabs button,
+.dashboard-images-fields .localized-field-tabs button {
+    min-width: 54px;
+    height: 29px;
+    padding: 0 9px;
+    position: relative;
+    border: 0;
+    border-radius: 7px;
+    color: var(--muted);
+    background: transparent;
+    font: inherit;
+    font-size: 9px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.dashboard-admin-localized-grid .localized-field-tabs button.active,
+.dashboard-images-fields .localized-field-tabs button.active {
+    color: #fff;
+    background: var(--primary);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.dashboard-admin-localized-grid .localized-field-tabs button i,
+.dashboard-images-fields .localized-field-tabs button i {
+    width: 5px;
+    height: 5px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    border-radius: 50%;
+    background: #22c55e;
+}
+
+.dashboard-admin-localized-grid .localized-field > input,
+.dashboard-admin-localized-grid .localized-field > textarea,
+.dashboard-images-fields .localized-field > input,
+.dashboard-images-fields .localized-field > textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    outline: 0;
+    color: var(--text);
+    background: var(--surface);
+    font: inherit;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.dashboard-admin-localized-grid .localized-field > input,
+.dashboard-images-fields .localized-field > input {
+    height: 43px;
+    padding: 0 12px;
+}
+
+.dashboard-admin-localized-grid .localized-field > textarea,
+.dashboard-images-fields .localized-field > textarea {
+    padding: 11px 12px;
+    resize: vertical;
+    line-height: 1.8;
+}
+
+.dashboard-admin-localized-grid .localized-field > input:focus,
+.dashboard-admin-localized-grid .localized-field > textarea:focus,
+.dashboard-images-fields .localized-field > input:focus,
+.dashboard-images-fields .localized-field > textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 9%, transparent);
+}
+
+@media(max-width:620px) {
+    .dashboard-admin-localized-grid .localized-field.is-full {
+        grid-column: auto;
+    }
+
+    .dashboard-admin-localized-grid .localized-field-heading,
+    .dashboard-images-fields .localized-field-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-admin-localized-grid .localized-field-tabs,
+    .dashboard-images-fields .localized-field-tabs {
+        width: 100%;
+    }
+
+    .dashboard-admin-localized-grid .localized-field-tabs button,
+    .dashboard-images-fields .localized-field-tabs button {
+        flex: 1;
+    }
+}

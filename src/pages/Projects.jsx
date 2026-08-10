@@ -1,11 +1,5 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
-
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-
 import {
   ArrowLeft,
   ExternalLink,
@@ -13,422 +7,150 @@ import {
   Search,
   Sparkles,
 } from 'lucide-react'
-
 import { motion } from 'framer-motion'
-
 import {
   loadProjectsData,
   PROJECTS_CHANGED_EVENT,
 } from '../data/projectsStore'
-
+import { localizedText, normalizeLocalizedValue } from '../i18n/localizedContent'
+import { useLanguage } from '../i18n/LanguageContext'
 import './Projects.css'
 
-function Projects() {
-  const [pageData, setPageData] = useState(
-    loadProjectsData,
-  )
+const allLanguageText = (value) => {
+  const localized = normalizeLocalizedValue(value)
+  return `${localized.fa} ${localized.ps} ${localized.en}`.toLocaleLowerCase()
+}
 
-  const [searchText, setSearchText] =
-    useState('')
+function Projects() {
+  const { language, direction, t } = useLanguage()
+  const [pageData, setPageData] = useState(loadProjectsData)
+  const [searchText, setSearchText] = useState('')
 
   useEffect(() => {
-    const refreshProjects = () => {
-      setPageData(loadProjectsData())
-    }
-
-    window.addEventListener(
-      PROJECTS_CHANGED_EVENT,
-      refreshProjects,
-    )
-
-    window.addEventListener(
-      'storage',
-      refreshProjects,
-    )
-
+    const refreshProjects = () => setPageData(loadProjectsData())
+    window.addEventListener(PROJECTS_CHANGED_EVENT, refreshProjects)
+    window.addEventListener('storage', refreshProjects)
     window.addEventListener('focus', refreshProjects)
-
     const handleVisibilityChange = () => {
       if (!document.hidden) refreshProjects()
     }
-
-    document.addEventListener(
-      'visibilitychange',
-      handleVisibilityChange,
-    )
-
+    document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
-      window.removeEventListener(
-        PROJECTS_CHANGED_EVENT,
-        refreshProjects,
-      )
-
-      window.removeEventListener(
-        'storage',
-        refreshProjects,
-      )
-
+      window.removeEventListener(PROJECTS_CHANGED_EVENT, refreshProjects)
+      window.removeEventListener('storage', refreshProjects)
       window.removeEventListener('focus', refreshProjects)
-      document.removeEventListener(
-        'visibilitychange',
-        handleVisibilityChange,
-      )
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [])
 
   const activeProjects = useMemo(
-    () =>
-      (Array.isArray(pageData.projects)
-        ? pageData.projects
-        : []
-      )
-        .filter(
-          (project) =>
-            project.active !== false &&
-            Boolean(project.image),
-        )
-        .sort(
-          (firstProject, secondProject) =>
-            Number(firstProject.order || 0) -
-            Number(secondProject.order || 0),
-        ),
+    () => (Array.isArray(pageData.projects) ? pageData.projects : [])
+      .filter((project) => project.active !== false && Boolean(project.image))
+      .sort((a, b) => Number(a.order || 0) - Number(b.order || 0)),
     [pageData.projects],
   )
 
   const featuredProject = useMemo(
-    () =>
-      activeProjects.find(
-        (project) =>
-          project.featured === true,
-      ) || activeProjects[0],
+    () => activeProjects.find((project) => project.featured === true) || activeProjects[0],
     [activeProjects],
   )
 
   const filteredProjects = useMemo(() => {
-    const normalizedSearch = searchText
-      .trim()
-      .toLocaleLowerCase()
-
-    if (!normalizedSearch) {
-      return activeProjects
-    }
-
-    return activeProjects.filter(
-      (project) => {
-        const category =
-          project.categoryLabel ||
-          project.category ||
-          ''
-
-        const searchableText = [
-          project.title,
-          project.description,
-          project.location,
-          project.client,
-          project.year,
-          project.status,
-          category,
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .toLocaleLowerCase()
-
-        return searchableText.includes(
-          normalizedSearch,
-        )
-      },
-    )
+    const query = searchText.trim().toLocaleLowerCase()
+    if (!query) return activeProjects
+    return activeProjects.filter((project) => {
+      const searchableText = [
+        project.title,
+        project.description,
+        project.location,
+        project.client,
+        project.status,
+        project.categoryLabel,
+      ].map(allLanguageText).join(' ')
+      return searchableText.includes(query) || String(project.year || '').toLocaleLowerCase().includes(query)
+    })
   }, [activeProjects, searchText])
 
   const locationCount = useMemo(
-    () =>
-      new Set(
-        activeProjects
-          .map(
-            (project) =>
-              project.location,
-          )
-          .filter(Boolean),
-      ).size,
+    () => new Set(activeProjects.map((project) => localizedText(project.location, 'fa')).filter(Boolean)).size,
     [activeProjects],
   )
 
   const completedCount = useMemo(
-    () =>
-      activeProjects.filter(
-        (project) =>
-          project.status ===
-            'تکمیل‌شده' ||
-          project.status ===
-            'تکمیل شده' ||
-          project.completed === true,
-      ).length,
+    () => activeProjects.filter((project) => {
+      const status = `${allLanguageText(project.status)}`
+      return project.completed === true || status.includes('تکمیل') || status.includes('completed') || status.includes('بشپړه')
+    }).length,
     [activeProjects],
   )
 
-  const scrollToProjects = () => {
-    document
-      .getElementById(
-        'completed-projects',
-      )
-      ?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
-  }
-
   const section = pageData.section || {}
+  const l = (value) => localizedText(value, language)
+  const scrollToProjects = () => document.getElementById('completed-projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   if (!featuredProject) {
     return (
-      <main
-        className="projects-page"
-       
-      >
+      <main className="projects-page" dir={direction}>
         <div className="projects-page-container">
-          <div className="projects-page-empty">
-            {section.emptyMessage ||
-              'هنوز هیچ پروژه‌ای ثبت نشده است.'}
-          </div>
+          <div className="projects-page-empty">{l(section.emptyMessage) || t('projects.noProjects')}</div>
         </div>
       </main>
     )
   }
 
-  return (
-    <main
-      className="projects-page"
-     
-    >
-      {/* بخش اول صفحه پروژه‌ها */}
+  const featuredTitle = l(featuredProject.title)
+  const featuredCategory = l(featuredProject.categoryLabel) || featuredProject.category || t('projects.project')
 
+  return (
+    <main className="projects-page" dir={direction}>
       <section className="projects-hero">
         <div className="projects-hero-orb projects-hero-orb-one" />
-
         <div className="projects-hero-orb projects-hero-orb-two" />
-
         <div className="projects-container projects-hero-layout">
-          <motion.div
-            className="projects-hero-content"
-            initial={{
-              opacity: 0,
-              y: 28,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.65,
-            }}
-          >
-            <span className="projects-eyebrow">
-              <Sparkles size={17} />
-
-              {section.eyebrow ||
-                'پروژه‌های اجراشده'}
-            </span>
-
-            <h1>
-              {section.title ||
-                'رنگ‌هایی که'}
-
-              <span>
-                {' '}
-                {section.highlight ||
-                  'فضا را تغییر داده‌اند'}
-              </span>
-            </h1>
-
-            <p>
-              {section.description ||
-                'مجموعه‌ای از پروژه‌های ساختمانی، صنعتی و دکوراتیف شرکت رنگ‌سازی علیمی را مشاهده کنید.'}
-            </p>
-
+          <motion.div className="projects-hero-content" initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.65 }}>
+            <span className="projects-eyebrow"><Sparkles size={17} />{l(section.eyebrow)}</span>
+            <h1>{l(section.title)} <span>{l(section.highlight)}</span></h1>
+            <p>{l(section.description)}</p>
             <div className="projects-hero-actions">
-              <button
-                type="button"
-                className="projects-primary-button"
-                onClick={scrollToProjects}
-              >
-                مشاهده پروژه‌ها
-
-                <ArrowLeft size={18} />
+              <button type="button" className="projects-primary-button" onClick={scrollToProjects}>
+                {t('projects.viewProjects')}<ArrowLeft size={18} />
               </button>
-
-              <Link
-                className="projects-secondary-button"
-                to="/contact"
-              >
-                ثبت پروژه جدید
-              </Link>
+              <Link className="projects-secondary-button" to="/contact">{t('projects.startProject')}</Link>
             </div>
-
             <div className="projects-statistics">
-              <div>
-                <strong>
-                  {activeProjects.length}+
-                </strong>
-
-                <span>
-                  پروژه ثبت‌شده
-                </span>
-              </div>
-
-              <div>
-                <strong>
-                  {locationCount}
-                </strong>
-
-                <span>
-                  موقعیت کاری
-                </span>
-              </div>
-
-              <div>
-                <strong>
-                  {completedCount}
-                </strong>
-
-                <span>
-                  پروژه تکمیل‌شده
-                </span>
-              </div>
+              <div><strong>{activeProjects.length}+</strong><span>{t('projects.registeredProjects')}</span></div>
+              <div><strong>{locationCount}</strong><span>{t('projects.workLocations')}</span></div>
+              <div><strong>{completedCount}</strong><span>{t('projects.completedProjects')}</span></div>
             </div>
           </motion.div>
 
-          <motion.article
-            className="projects-featured-card"
-            initial={{
-              opacity: 0,
-              scale: 0.94,
-              x: -30,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              x: 0,
-            }}
-            transition={{
-              duration: 0.75,
-              delay: 0.1,
-            }}
-          >
-            <img
-              src={featuredProject.image}
-              alt={
-                featuredProject.alt ||
-                featuredProject.title
-              }
-              style={{
-                objectPosition:
-                  featuredProject.objectPosition ||
-                  'center',
-              }}
-            />
-
+          <motion.article className="projects-featured-card" initial={{ opacity: 0, scale: 0.94, x: -30 }} animate={{ opacity: 1, scale: 1, x: 0 }} transition={{ duration: 0.75, delay: 0.1 }}>
+            <img src={featuredProject.image} alt={l(featuredProject.alt) || featuredTitle} style={{ objectPosition: featuredProject.objectPosition || 'center' }} />
             <span className="projects-featured-overlay" />
-
             <div className="projects-featured-top">
-              <span>
-                {featuredProject.year ||
-                  ''}
-              </span>
-
-              <span className="projects-status-badge">
-                {featuredProject.status ||
-                  'تکمیل‌شده'}
-              </span>
+              <span>{featuredProject.year || ''}</span>
+              <span className="projects-status-badge">{l(featuredProject.status)}</span>
             </div>
-
             <div className="projects-featured-content">
-              <small>
-                {featuredProject.categoryLabel ||
-                  featuredProject.category ||
-                  'پروژه منتخب'}
-              </small>
-
-              <h2>
-                {featuredProject.title}
-              </h2>
-
-              <div>
-                <MapPin size={16} />
-
-                {featuredProject.location ||
-                  'افغانستان'}
-              </div>
+              <small>{featuredCategory}</small>
+              <h2>{featuredTitle}</h2>
+              <div><MapPin size={16} />{l(featuredProject.location) || t('projects.afghanistan')}</div>
             </div>
-
-            <Link
-              to={`/projects/${encodeURIComponent(featuredProject.id)}`}
-              aria-label="مشاهده پروژه منتخب"
-            >
-              <ExternalLink size={20} />
-            </Link>
+            <Link to={`/projects/${encodeURIComponent(featuredProject.id)}`} aria-label={`${t('projects.viewProject')}: ${featuredTitle}`}><ExternalLink size={20} /></Link>
           </motion.article>
         </div>
       </section>
 
-      {/* لیست تمام پروژه‌ها */}
-
-      <section
-        id="completed-projects"
-        className="projects-page-hero"
-      >
+      <section id="completed-projects" className="projects-page-hero">
         <div className="projects-page-container">
-          <motion.div
-            className="projects-page-heading"
-            initial={{
-              opacity: 0,
-              y: 24,
-            }}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-            }}
-            viewport={{
-              once: true,
-              amount: 0.2,
-            }}
-            transition={{
-              duration: 0.5,
-            }}
-          >
-            <span className="projects-page-eyebrow">
-              <Sparkles size={17} />
-
-              آرشیف پروژه‌ها
-            </span>
-
-            <h1>
-              پروژه‌هایی که با موفقیت{' '}
-
-              <strong>
-                تکمیل کرده‌ایم
-              </strong>
-            </h1>
-
-            <p>
-              براساس نام پروژه، مشتری، موقعیت یا
-              دسته‌بندی جستجو کنید.
-            </p>
+          <motion.div className="projects-page-heading" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.5 }}>
+            <span className="projects-page-eyebrow"><Sparkles size={17} />{t('projects.archive')}</span>
+            <h1>{t('projects.archiveTitleBefore')} <strong>{t('projects.archiveTitleHighlight')}</strong></h1>
+            <p>{t('projects.archiveDescription')}</p>
           </motion.div>
-
           <div className="projects-page-tools">
-            <label className="projects-page-search">
-              <Search size={18} />
-
-              <input
-                type="search"
-                value={searchText}
-                onChange={(event) =>
-                  setSearchText(
-                    event.target.value,
-                  )
-                }
-                placeholder="جستجوی پروژه، مشتری یا موقعیت..."
-              />
+            <label className="projects-page-search"><Search size={18} />
+              <input type="search" value={searchText} onChange={(event) => setSearchText(event.target.value)} placeholder={t('projects.searchPlaceholder')} />
             </label>
           </div>
         </div>
@@ -438,147 +160,40 @@ function Projects() {
         <div className="projects-page-container">
           {filteredProjects.length ? (
             <div className="projects-page-grid">
-              {filteredProjects.map(
-                (project, index) => {
-                  const category =
-                    project.categoryLabel ||
-                    project.category ||
-                    'پروژه'
-
-                  return (
-                    <motion.article
-                      key={project.id}
-                      className="projects-page-card"
-                      initial={{
-                        opacity: 0,
-                        y: 24,
-                      }}
-                      whileInView={{
-                        opacity: 1,
-                        y: 0,
-                      }}
-                      viewport={{
-                        once: true,
-                        amount: 0.15,
-                      }}
-                      transition={{
-                        duration: 0.4,
-                        delay:
-                          (index % 4) *
-                          0.05,
-                      }}
-                    >
-                      <div className="projects-page-card-image">
-                        <img
-                          src={project.image}
-                          alt={
-                            project.alt ||
-                            project.title
-                          }
-                          style={{
-                            objectPosition:
-                              project.objectPosition ||
-                              'center',
-                          }}
-                        />
-
-                        <div className="projects-page-card-overlay" />
-
-                        <span className="projects-page-card-category">
-                          {category}
-                        </span>
-
-                        <span className="projects-page-card-year">
-                          {project.year}
-                        </span>
-
-                        <Link
-                          to={`/projects/${encodeURIComponent(project.id)}`}
-                          className="projects-page-card-open"
-                          aria-label={`مشاهده ${project.title}`}
-                        >
-                          <ExternalLink
-                            size={20}
-                          />
-                        </Link>
-                      </div>
-
-                      <div className="projects-page-card-content">
-                        <div className="projects-page-card-location">
-                          <MapPin size={15} />
-
-                          <span>
-                            {project.location ||
-                              'افغانستان'}
-                          </span>
+              {filteredProjects.map((project, index) => {
+                const title = l(project.title)
+                const category = l(project.categoryLabel) || project.category || t('projects.project')
+                return (
+                  <motion.article key={project.id} className="projects-page-card" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.4, delay: (index % 4) * 0.05 }}>
+                    <div className="projects-page-card-image">
+                      <img src={project.image} alt={l(project.alt) || title} style={{ objectPosition: project.objectPosition || 'center' }} />
+                      <div className="projects-page-card-overlay" />
+                      <span className="projects-page-card-category">{category}</span>
+                      <span className="projects-page-card-year">{project.year}</span>
+                      <Link to={`/projects/${encodeURIComponent(project.id)}`} className="projects-page-card-open" aria-label={`${t('projects.viewProject')}: ${title}`}><ExternalLink size={20} /></Link>
+                    </div>
+                    <div className="projects-page-card-content">
+                      <div className="projects-page-card-location"><MapPin size={15} /><span>{l(project.location) || t('projects.afghanistan')}</span></div>
+                      <h2>{title}</h2>
+                      <p>{l(project.description) || t('projects.defaultDescription')}</p>
+                      <div className="projects-page-card-footer">
+                        <div>
+                          {l(project.client) && <span>{t('projects.client')}: <strong>{l(project.client)}</strong></span>}
+                          {l(project.area) && <span>{t('projects.area')}: <strong>{l(project.area)}</strong></span>}
                         </div>
-
-                        <h2>
-                          {project.title}
-                        </h2>
-
-                        <p>
-                          {project.description ||
-                            'این پروژه توسط تیم متخصص شرکت رنگ‌سازی علیمی اجرا شده است.'}
-                        </p>
-
-                        <div className="projects-page-card-footer">
-                          <div>
-                            {project.client && (
-                              <span>
-                                مشتری:{' '}
-
-                                <strong>
-                                  {project.client}
-                                </strong>
-                              </span>
-                            )}
-
-                            {project.area && (
-                              <span>
-                                مساحت:{' '}
-
-                                <strong>
-                                  {project.area}
-                                </strong>
-                              </span>
-                            )}
-                          </div>
-
-                          <Link to={`/projects/${encodeURIComponent(project.id)}`}>
-                            بیشتر...
-
-                            <ArrowLeft
-                              size={17}
-                            />
-                          </Link>
-                        </div>
+                        <Link to={`/projects/${encodeURIComponent(project.id)}`}>{t('projects.more')}<ArrowLeft size={17} /></Link>
                       </div>
-                    </motion.article>
-                  )
-                },
-              )}
+                    </div>
+                  </motion.article>
+                )
+              })}
             </div>
           ) : (
             <div className="projects-page-empty">
               <Search size={36} />
-
-              <h2>
-                پروژه‌ای پیدا نشد
-              </h2>
-
-              <p>
-                عبارت جستجو را تغییر دهید.
-              </p>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setSearchText('')
-                }
-              >
-                نمایش تمام پروژه‌ها
-              </button>
+              <h2>{t('projects.notFound')}</h2>
+              <p>{t('projects.changeSearch')}</p>
+              <button type="button" onClick={() => setSearchText('')}>{t('projects.showAll')}</button>
             </div>
           )}
         </div>

@@ -4,6 +4,10 @@
   direction: rtl;
 }
 
+.dashboard-shell[dir='ltr'] .dashboard-page {
+  direction: ltr;
+}
+
 .dashboard-container {
   width: min(1180px, calc(100% - 40px));
   margin-inline: auto;
@@ -47,6 +51,21 @@
   grid-template-columns: 1.03fr 0.97fr;
   align-items: center;
   gap: 80px;
+}
+
+.dashboard-shell[dir='ltr'] .dashboard-hero-content {
+  order: 1;
+  text-align: left;
+}
+
+.dashboard-shell[dir='ltr'] .collection-slider-wrapper {
+  order: 2;
+}
+
+.dashboard-shell[dir='ltr'] .dashboard-actions,
+.dashboard-shell[dir='ltr'] .dashboard-changing-text,
+.dashboard-shell[dir='ltr'] .dashboard-eyebrow {
+  flex-direction: row;
 }
 
 .dashboard-paint-blob {
@@ -4492,5 +4511,161 @@
 @media (max-width: 650px) {
   .product-category-list {
     max-height: 390px;
+  }
+}
+
+/* ==================================
+   MOBILE FIX — PRODUCT CATEGORIES
+   Keep list + preview visible instead of overflowing off-canvas.
+================================== */
+@media (max-width: 760px) {
+  .product-categories-section {
+    padding: 72px 0 78px;
+    overflow: hidden;
+  }
+
+  .product-category-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 34px;
+  }
+
+  .product-category-heading {
+    width: 100%;
+    padding-top: 0;
+    text-align: right;
+  }
+
+  [dir='ltr'] .product-category-heading {
+    text-align: left;
+  }
+
+  .product-category-heading h2 {
+    font-size: clamp(42px, 14vw, 60px);
+  }
+
+  .product-category-heading p {
+    max-width: none;
+    margin-top: 16px;
+    font-size: 13px;
+  }
+
+  .product-category-browser {
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .product-category-list {
+    width: 100%;
+    max-height: 320px;
+    padding-inline-end: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .product-category-row {
+    min-height: 76px;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .product-category-row-arrow {
+    width: 38px;
+    height: 38px;
+  }
+
+  .product-category-row-line {
+    right: 44px;
+  }
+
+  .product-category-row-text strong {
+    font-size: 18px;
+  }
+
+  .product-category-preview {
+    width: 100%;
+    height: min(118vw, 470px);
+    min-height: 390px;
+    margin: 0;
+  }
+
+  .product-category-preview::before {
+    inset: 14px -10px -14px 10px;
+    border-radius: 28px;
+  }
+
+  .product-category-preview-card {
+    border-radius: 26px;
+  }
+
+  .product-category-preview-content {
+    right: 20px;
+    bottom: 22px;
+    left: 20px;
+  }
+
+  .product-category-preview-content h3 {
+    font-size: 25px;
+  }
+}
+
+@media (max-width: 420px) {
+  .product-category-list {
+    max-height: 290px;
+  }
+
+  .product-category-preview {
+    min-height: 360px;
+    height: 112vw;
+  }
+}
+
+/* Final direction-aware hero ordering. Dashboard.css contains repeated hero
+   blocks, so this override must stay at the end. */
+.dashboard-shell[dir='ltr'] .dashboard-hero-grid {
+  direction: ltr;
+  grid-template-areas: "copy media";
+}
+
+.dashboard-shell[dir='rtl'] .dashboard-hero-grid {
+  direction: rtl;
+  grid-template-areas: "media copy";
+}
+
+.dashboard-shell .dashboard-hero-content {
+  grid-area: copy;
+}
+
+.dashboard-shell .collection-showcase {
+  grid-area: media;
+}
+
+.dashboard-shell[dir='ltr'] .dashboard-hero-content {
+  text-align: left;
+}
+
+.dashboard-shell[dir='rtl'] .dashboard-hero-content {
+  text-align: right;
+}
+
+@media (max-width: 1000px) {
+  .dashboard-shell[dir='ltr'] .dashboard-hero-content,
+  .dashboard-shell[dir='ltr'] .collection-showcase,
+  .dashboard-shell[dir='rtl'] .dashboard-hero-content,
+  .dashboard-shell[dir='rtl'] .collection-showcase {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .dashboard-shell[dir='ltr'] .dashboard-hero-grid,
+  .dashboard-shell[dir='rtl'] .dashboard-hero-grid {
+    grid-template-areas:
+      "copy"
+      "media";
   }
 }

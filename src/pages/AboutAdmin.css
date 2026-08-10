@@ -790,3 +790,132 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ===== Phase 5: multilingual About admin fields ===== */
+.about-admin .localized-field {
+  min-width: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.about-admin .localized-field-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.about-admin .localized-field-heading > span {
+  color: var(--admin-text, #15171a);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.about-admin .localized-field-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--admin-line, #e7e8eb);
+  border-radius: 10px;
+  background: var(--admin-soft, #f7f8fa);
+}
+
+.about-admin .localized-field-tabs button {
+  min-width: 54px;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #777e88;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  position: relative;
+}
+
+.about-admin .localized-field-tabs button.active {
+  color: #fff;
+  background: #ff641e;
+  box-shadow: 0 5px 14px rgba(255, 100, 30, 0.18);
+}
+
+.about-admin .localized-field-tabs button i {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #20a464;
+}
+
+.about-admin .localized-field > input,
+.about-admin .localized-field > textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #dfe2e7;
+  border-radius: 10px;
+  background: #fff;
+  color: #22252a;
+  font: inherit;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.about-admin .localized-field > input {
+  height: 44px;
+  padding: 0 13px;
+}
+
+.about-admin .localized-field > textarea {
+  min-height: 104px;
+  padding: 12px 13px;
+  line-height: 1.9;
+  resize: vertical;
+}
+
+.about-admin .localized-field > input:focus,
+.about-admin .localized-field > textarea:focus {
+  border-color: #ff641e;
+  box-shadow: 0 0 0 3px rgba(255, 100, 30, 0.08);
+}
+
+.about-admin .localized-field-actions {
+  display: none !important;
+}
+
+.about-admin-localized-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: end;
+  gap: 10px;
+}
+
+.about-admin-localized-row > button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #ffd7c4;
+  border-radius: 10px;
+  color: #e34c20;
+  background: #fff8f4;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .about-admin .localized-field-heading {
+    align-items: flex-start;
+  }
+  .about-admin .localized-field-tabs {
+    width: 100%;
+  }
+  .about-admin .localized-field-tabs button {
+    flex: 1;
+  }
+}

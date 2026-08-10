@@ -1,3 +1,5 @@
+import { normalizeLocalizedValue } from '../i18n/localizedContent'
+
 export const CONTACT_STORAGE_KEY = 'alimi-contact-data-v1'
 export const CONTACT_MESSAGES_STORAGE_KEY = 'alimi-contact-messages-v1'
 export const CONTACT_CHANGED_EVENT = 'alimi-contact-data-changed'
@@ -112,14 +114,61 @@ export const defaultContactData = {
 }
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
+const localize = (value) => normalizeLocalizedValue(value, 'fa')
+const localizeSection = (section = {}) =>
+  Object.fromEntries(
+    Object.entries(section).map(([key, value]) => [key, localize(value)]),
+  )
+
+const normalizeHero = (hero = {}) =>
+  localizeSection({ ...clone(defaultContactData.hero), ...hero })
+
+const normalizeFormSection = (formSection = {}) => {
+  const { fields: _defaultFields, ...defaultFormText } = clone(defaultContactData.formSection)
+  const { fields: savedFields, ...savedFormText } = formSection
+
+  return {
+    ...localizeSection({ ...defaultFormText, ...savedFormText }),
+    fields: localizeSection({
+      ...clone(defaultContactData.formSection.fields),
+      ...(savedFields || {}),
+    }),
+  }
+}
+
+const normalizeLocation = (location = {}) => {
+  const { mapEmbedUrl, mapOpenUrl, ...defaultLocationText } = clone(defaultContactData.location)
+  const {
+    mapEmbedUrl: savedMapEmbedUrl,
+    mapOpenUrl: savedMapOpenUrl,
+    ...savedLocationText
+  } = location
+
+  return {
+    ...localizeSection({ ...defaultLocationText, ...savedLocationText }),
+    mapEmbedUrl: savedMapEmbedUrl || mapEmbedUrl,
+    mapOpenUrl: savedMapOpenUrl || mapOpenUrl,
+  }
+}
+
+const normalizeFinalCta = (finalCta = {}) => {
+  const { phone, ...defaultFinalCtaText } = clone(defaultContactData.finalCta)
+  const { phone: savedPhone, ...savedFinalCtaText } = finalCta
+
+  return {
+    ...localizeSection({ ...defaultFinalCtaText, ...savedFinalCtaText }),
+    phone: savedPhone || phone,
+  }
+}
 
 const normalizePhones = (saved) => {
   if (Array.isArray(saved?.phones) && saved.phones.length) {
     return saved.phones.map((phone, index) => ({
       id: phone.id || `phone-${Date.now()}-${index}`,
-      label: phone.label || `شماره تماس ${index + 1}`,
+      label: localize(phone.label || `شماره تماس ${index + 1}`),
       number: phone.number || '',
-      note: phone.note || '',
+      note: localize(phone.note || ''),
+      whatsapp: phone.whatsapp === true,
       active: phone.active !== false,
       order: Number(phone.order) || index + 1,
     }))
@@ -132,46 +181,60 @@ const normalizePhones = (saved) => {
   if (oldPhoneItem?.value) {
     return [{
       id: 'phone-1',
-      label: oldPhoneItem.title || 'شماره تماس اصلی',
+      label: localize(oldPhoneItem.title || 'شماره تماس اصلی'),
       number: oldPhoneItem.value,
-      note: oldPhoneItem.note || '',
+      note: localize(oldPhoneItem.note || ''),
+      whatsapp: oldPhoneItem.whatsapp === true,
       active: oldPhoneItem.active !== false,
       order: 1,
     }]
   }
 
-  return clone(defaultContactData.phones)
+  return clone(defaultContactData.phones).map((phone) => ({
+    ...phone,
+    label: localize(phone.label),
+    note: localize(phone.note),
+    whatsapp: phone.whatsapp === true,
+  }))
 }
+
+const normalizeContactItems = (saved) => {
+  const items = Array.isArray(saved?.contactItems)
+    ? saved.contactItems.filter((item) => item.icon !== 'phone')
+    : clone(defaultContactData.contactItems)
+
+  return items.map((item, index) => ({
+    id: item.id || `contact-item-${Date.now()}-${index}`,
+    icon: item.icon || 'mail',
+    title: localize(item.title || ''),
+    value: localize(item.value || ''),
+    note: localize(item.note || ''),
+    href: item.href || '',
+    active: item.active !== false,
+    order: Number(item.order) || index + 1,
+  }))
+}
+
+const normalizeContactData = (data = defaultContactData) => ({
+  ...clone(defaultContactData),
+  ...data,
+  hero: normalizeHero(data.hero),
+  phones: normalizePhones(data),
+  contactItems: normalizeContactItems(data),
+  formSection: normalizeFormSection(data.formSection),
+  location: normalizeLocation(data.location),
+  finalCta: normalizeFinalCta(data.finalCta),
+})
 
 export function loadContactData() {
   try {
     const saved = JSON.parse(localStorage.getItem(CONTACT_STORAGE_KEY) || 'null')
 
     if (!saved || typeof saved !== 'object') {
-      return clone(defaultContactData)
+      return normalizeContactData(defaultContactData)
     }
 
-    const contactItems = Array.isArray(saved.contactItems)
-      ? saved.contactItems.filter((item) => item.icon !== 'phone')
-      : clone(defaultContactData.contactItems)
-
-    return {
-      ...clone(defaultContactData),
-      ...saved,
-      hero: { ...clone(defaultContactData.hero), ...(saved.hero || {}) },
-      phones: normalizePhones(saved),
-      contactItems,
-      formSection: {
-        ...clone(defaultContactData.formSection),
-        ...(saved.formSection || {}),
-        fields: {
-          ...clone(defaultContactData.formSection.fields),
-          ...(saved.formSection?.fields || {}),
-        },
-      },
-      location: { ...clone(defaultContactData.location), ...(saved.location || {}) },
-      finalCta: { ...clone(defaultContactData.finalCta), ...(saved.finalCta || {}) },
-    }
+    return normalizeContactData(saved)
   } catch (error) {
     console.error('Unable to load contact data:', error)
     return clone(defaultContactData)
@@ -189,7 +252,7 @@ export function saveContactData(data) {
 }
 
 export function resetContactData() {
-  const data = clone(defaultContactData)
+  const data = normalizeContactData(defaultContactData)
   saveContactData(data)
   return data
 }

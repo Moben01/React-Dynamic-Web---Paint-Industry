@@ -1,16 +1,230 @@
 {
   "settings": {
     "enabled": true,
-    "title": "دستیار هوشمند علیمی",
-    "statusText": "آماده پاسخ‌گویی",
+    "title": {
+      "fa": "دستیار هوشمند علیمی",
+      "ps": "",
+      "en": ""
+    },
+    "statusText": {
+      "fa": "آماده پاسخ‌گویی",
+      "ps": "",
+      "en": ""
+    },
     "adminName": "مدیر علیمی",
-    "namePromptTitle": "قبل از شروع، نام‌تان را بنویسید",
-    "namePromptText": "برای اینکه بتوانیم بهتر پاسخ بدهیم، لطفاً نام خود را وارد کنید.",
-    "namePlaceholder": "نام شما...",
-    "welcomeMessage": "سلام {name}! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
-    "messagePlaceholder": "پیام خود را بنویسید..."
+    "namePromptTitle": {
+      "fa": "قبل از شروع، نام‌تان را بنویسید",
+      "ps": "",
+      "en": ""
+    },
+    "namePromptText": {
+      "fa": "برای اینکه بتوانیم بهتر پاسخ بدهیم، لطفاً نام خود را وارد کنید.",
+      "ps": "",
+      "en": ""
+    },
+    "namePlaceholder": {
+      "fa": "نام شما...",
+      "ps": "",
+      "en": ""
+    },
+    "welcomeMessage": {
+      "fa": "سلام {name}! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+      "ps": "",
+      "en": ""
+    },
+    "messagePlaceholder": {
+      "fa": "پیام خود را بنویسید...",
+      "ps": "",
+      "en": ""
+    }
   },
   "conversations": [
+    {
+      "id": "chat-17b73b3f-6d0f-42cb-b59e-1a90d6484fe5",
+      "visitorName": "علی",
+      "visitorId": "visitor-5c32a986-6d79-4593-be27-fa91d655b1ea",
+      "createdAt": 1786197441962,
+      "updatedAt": 1786197472944,
+      "unreadByAdmin": 1,
+      "unreadByUser": 0,
+      "messages": [
+        {
+          "id": "message-b6ec8079-140f-4dbc-8891-1a6aa712f21f",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام علی! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+          "createdAt": 1786197441962,
+          "system": true
+        },
+        {
+          "id": "message-d5314508-9f52-470e-b687-23d80ac65f95",
+          "sender": "user",
+          "senderName": "علی",
+          "text": "سلام",
+          "createdAt": 1786197445603
+        },
+        {
+          "id": "message-9832da5a-ee66-4b9d-bffe-28d7fb3db7fa",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام علیک",
+          "createdAt": 1786197465242
+        },
+        {
+          "id": "message-a17e5132-c74e-45b2-81b5-c6d2409c3cc6",
+          "sender": "user",
+          "senderName": "علی",
+          "text": "خوب استی برادر",
+          "createdAt": 1786197472944
+        }
+      ]
+    },
+    {
+      "id": "chat-c0a19369-c099-4d2d-83ec-799c24e5f977",
+      "visitorName": "مسیخ",
+      "visitorId": "visitor-1e99f7a5-ecfc-4732-b99e-d3d2d6e68d26",
+      "createdAt": 1786192745681,
+      "updatedAt": 1786196430750,
+      "unreadByAdmin": 0,
+      "unreadByUser": 0,
+      "messages": [
+        {
+          "id": "message-8e5d9eb8-c5ea-455f-b538-dfbcdd999593",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام مسیخ! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+          "createdAt": 1786192745681,
+          "system": true
+        },
+        {
+          "id": "message-52eebf69-52d3-4f40-9d1a-9c0b97b19295",
+          "sender": "user",
+          "senderName": "مسیخ",
+          "text": "درخواست معلومات محصول\nنام محصول: رنگ پلاستیک ممتاز علیمی\nآیدی محصول: 1\nلینک محصول: http://localhost:5173/products/1\nعکس محصول: https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=1200&auto=format&fit=crop&q=85",
+          "createdAt": 1786192749056
+        },
+        {
+          "id": "message-c7d5ee13-6b0e-4172-8ba4-8fdd06579f31",
+          "sender": "user",
+          "senderName": "مسیخ",
+          "text": "برادر همین را چند گفتین---\nضمیمه محصول\nنام محصول: رنگ پلاستیک ممتاز علیمی\nآیدی محصول: 1\nلینک محصول: http://localhost:5173/products/1\nعکس محصول: data:image/webp;base64,UklGRqwuAABXRUJQVlA4WAoAAAAQAAAArwQAogIAQUxQSO8bAAABHMVt2zjS/nOnXL9nREwA+CmBCdi7vQ3dlmwm9vvqw/b/nZPYe81MMpM2gXFigAgxSgQUUAiggOgRsMAqWCg2igVUyioaith7x4YCim5Y0dji0nZFbCNEgoIRpUjYyIZigJAhkMpMMjOvP76fz+dbJpxzfvF7/U5ETACDSJKc2EEfHjGBoydz4TsiJgD/53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+53/+b4Pbt7NZuenIkedsVRK+JVk21W2f4i6h9uczXDYrbFqWYbNCNk3LsFlhtPwymxWSHw62W2HkkXY2K+Sev7ptVsgNg902Kwx/mmGzQh68v73NClme67JZYdMHp9uskIcmptusMFba3WaFDC/obLNC1lzqtllhy5c9bFbI5rkdbVYY23uFzQrJ5T3tVhi+LcVmhfxhuN0KubCr3UqsZorNCsm1/2XX4XLHC/m015aj14riy+KGZTfbb2Q+SnJj/JCrettsjDgUjTfWP26n0ecTCuOL3HqNXUbaXErjjfws02GHMXp71BonLMF999tfdH+fqqbsdA36Z70FyB+GuOwtHqijVdYBrn5brMCm5R4bixGbqNOUSgBIuGlLzDyyfIpNhSOjgLpNOeSGNmFOrQXIHbkOO4r799FSQb8AyH07YgFWv5pkN+EatIlGWgOOYT9HzSOLO9pLeJY3MX6A5NkhC7DAVmLKfhpsGaDPR83mnci1jXB220HDLQTHuKMxs7jQLiJpYQ1bA6Djs2GzyuwhEsbto5nWAi7aHDGn0hYiu7SZrQhS7ra7SH+0hiZbDuizosXGImFYHU2PA2DiMduKrp83slVC9pv2FOl3H6MV4wMYvd2GYtCRKFsxpC21m+i25AQtGjdI+9hWImlaIy0bP8iosZG4aHOEJwHvbtuInNfDtLL9h2PScVrb9mPI2ijtVHwv0/rx9G/7B+eUXbGTySlVtg/9VjAu48gftHlIfrWBdiquG36J0U6l07e0YtPz7mKbEO+zh2jFTYOAlbYgruG/0IpVDwNAoFXxHbRpyFwdphW/znK0Pt7dtgzp8w7QirsmuiG0/XD02EUr1j0Oue3HRUdpxTe7wzYks5rmNwcGQrl1SfvNfmE6za+7zo3Wy7PJfmGxaVVPtINeMxLXG1HtM8ddYr9QYFL42yzoNwM3RwyohK3GrssSYC3XzJD9xatmHHggEYZ+agaQt9FiznX2C4+Z8NGpMLjAHCRdV2MprLaPKB8Lw80COr8StuE48ZkH8QOMOtGKubyn+LwuA9x+o9N0JPgHP/9tHckd79+SmerQk+L3+/2nOPQl+/1+v89hgCvN70tzGpDs1zr0Odr7/X6/24g0v25vgkGO1A4jHnuzeOOCJ6/M8jrUvH6/33+KU0+S39/eoSfFr3UCSPAb7RW09+tun9QGqupyF+IKt7Vanjs+333o4O7P7/DoWlwdNLg0SWlyoJqKDduey9CxJhgMBg+N01cSDAaDB6/TlTpj3c4jlbtWjnXqWhYMBoNVz+jrty8YDAa/MqD9jqDu3d/MaW/EeX/b1khp0+6VQ1Uyfg4Gg8FD43RkbwwGDyx2q3mLg9qbASwPGr0lHUC334O6921Z1K+tU1k2TLWEu7x1cpy/ntL1vfVso+G9Za6R26n7xD0dlcLUFumjcIEOx8BSStd111NBbWiUrlEU5ujrTUOr7/Lp6flWiHq/uMApya2ltlAtYz+1s9TOP0HtMwAqaXgWgEEhGrqse9umwTB3iRXwaut00XEqHsqxmvvjMA2M/Z6tQisNa6BiudcQHsmOK8a+86rlN9DApuclnsOCarWhLYINatMpvCpeWDOsTRNMfswSC1qlPlVU3p9jrR5f0ODQLXExsIbKv/kN4fcpcUWWn6ngWxilsYUdBXhAwBFKT1NYn65UKqhNixvWXONos/X4SesD6nzGIucIvDto/FSH9RK/o84ZxnBJQnxxnVuS9A0NL04VoF4QcCg494k4U6Uzha/DlFgnU1h3RputpSerjHo9+ywR+4dHk/EzFUuXzJ8/f22jQuhy653RpGevQZwRZ3xE5F4WUzjx00eF2xsVuNojWCOoyVI4n9KdLoWHBaGzzAmkmMPtqVGroFVx/MtCT1L3GAOa8mDwSzHJHwu7QJh4849REQ+fZrkXqPsqg2oGWGlzJsSuiz5qEe32CqZT2vT52BQASBr5z1oJH3FqZgiahyu8KKvNlSVuEOxMU6nqAWMlBZCfOe+giJMygHujdbyH9G014AcYfE2E4o3ZDsiTbgqJ+LHV0sP6VjmM4aFsC42HYsK4FkGsn8Z7TLKvbyKkrrxKSWSoppeAL8g8P8iil8t8lYJlUPkO5tyiAJxWLVqeAkqsMyikr/5sfRsNSvmR4qUeqF9SJXrHajdQ/952BnGV2zpjVOD+QsA3ACR+TfGmM6Hs+0zEgAalggNuSUaNjMtkV1E4XClg0mQlXN0s2J4BUn6xzosUtzzyfETEaVbpS/H3Hujt00iG/pidYrV3JY1T3pZwqFF8yxEXGCfaCKBfk2h/FvRuFXGA5iYBL5aMpmK1S7JScADxknlUwKi1slVpV2GZpBrJ4gRPQPKjVb4UVXSEbueUn164IBlS61RLnnemFEtKDWscEx+9VR6hsKYrdHerFW1wAfBXCRZJSlV4jahzi+CJuHEcbNsVaFUuiFjmJorrU4C8ZhHPt0ZniufCbMvMpLiuPXBBi4jn6vo1LGDjgLjop1Imegla/x0/Rrn7gRwN5omOnw7A/Z1gW6qgM7XNNYK/OQQTqA0Nihv3obZdOy2Rb5WedbSK6wtJEQBskSzStc2YsaJqt0XW6crWlVAhWQwgbZfkQV1zPxKxNC7miNYBPSg+V9OzIkrtgRyNa7+gZSgAzBHUZwpuFgRfFGxLFbwhqEpTK7HSWbWCqqB1RYsleocskXj9LlrGXyWZrHlQ8luaHi59TH16mmaeaCksEnr1MZ2bdfVpFDVfCsC5VFKsK9+3QcSVadZL3SGaBUwR7QAATzGlVTkAsFTAaZrOYQ1nCZYK1nQOaxqzBeWCV6DW8s5j6jM8ZjwdFWwKWYmD62kJx0MN5jk6r6DBxkygOJKp6SdhH12679UsEY1XcLX3601TMlxhDsVVmQBwUUzEXF3oeUwUm+GwxCSV9NUUhjoAz4me1dxDxTc0d4he1+ATQaVT82/BUKzXcJ6mL7XRLB36nzYu8S6KX4xYZ6wI0RpA/xKzUhccpoXc5ZJ3oXWWSorMekxTIGi+WOZ4Yn9Q55Hf8qxUJlkEratUskwfhoUFbLzWElWzbhRPXFRO8SYPUCQaCcBTobJdc4WoUHBNVMNzAeRFNQeAaYIKzTJBCUwq0pV03Y3CB74LSfrFK99fG2mwIcD9lWa4R2yn8YYMoTjUS4DxMRE7Wyc0SOYuof7ZFhpJcShbgGkx0dEO+vCgiPu6WMHI0LUAVouyAPiDKmHNJWpn1gpmA1hE7XLgvEYN+wK+asGTFnMVUW/sbYSrAfujtJSjw2fGZfyrmdZ6QbItVeSrlExvJe61jmOl5GuIezeIIpcZ4F4tYoUnLh50mEEDHD8J1gDeQ4IJQFqVYAbQr0lwkcXcJbp2pLe1On1xmMYbBGD0ugMPGNH+/oM01ZDtkpcdIuc/JGtMyleJDDdlsnXa7ZHcI0n8VcRlBsD/q4iL46BleToAfCa6DIBnr8p2zQg1jBcc8yCvSZAL4BXBp8BsaquSzHrFrLI8tK3y3EJTjTM2oW85TTaiP8XRHpCOkYQ8Ov4oUi/I1Dwr4F0KGw0YrRL9T5H66jod/0VxrKcEEyT0GYC8JhGnOKzW+CCET4meBIA5MYXnNdNFS0So1vCxdg9RuwUAsqKa2q6+XYJ50BM79M8i5Xe95kRKs9C2amBxs5VcU1cvzDDu9MITtN43kg2Qe/aK+JTaPh+MnCZaIXM8ZsA5KpuTofNiHT9KvoU84YDkPiNwfVhUO9Bif+/rFN0u+lWTsFHWmK1ZKpouKRREKiKC8Rps17DuILWNp+va6YWxRr2WjDZVnV6i2TqyC2Pk4ZuSjfFNqqb5BfpOPy6K3aCARyVHvEobYejFInaVqF5cK6pzqxRBt9rZFEcuUMBbko1uI1xvRwUsu8u0HSXyFXM6Q36OiOcCwJlbY4J/9wGA5D2ClmGS2wXSmgzBiwLpliRdAZiEqSUlJSW/REQz0aZq4tGYaTOVBu+nNlLe04j+O2O0YH99Y2Oi4znAIG0e0L9JFL7QvFTJ+w597faIlsEy+ZLf0+EepD0PGCupyzQCCWtFbDLrg1S33AFVxz7R8xqk3l1Nhp5uB+1cCo+fLumi9r1bMEbtcVgObrfbnfKMaGtbqvPXttD0JUkKnidDlB57tpOe7oubacUA9K+leIPzyuMU/nFu2n4RXzAPL4lq+uq7JyoI9bZOseTvzgkhCrdlptWKOM8Q5FaJpMaNgdGPio711ADO7ByIu9WJNjgl+ELpGQgzQkrd40B4+mEBH28zlf4ETY/VTIHiaRupXH1JokrSdTW0ZMvV+rpQHBuKbyl9HfdLqhPNO7VWwLpcPWMo3pxsmQ6UXoQfKX0M8yR1iYaga0N89W0SsKKjQDG5mMJof8j7xRRieSK8p7Ie8YI7o4K67m2kxpbFzFvYFYoddlBn6PPesiEbac3fRzr1PSfZCXwlewXeGhFvNs/1q",
+          "createdAt": 1786196405531
+        },
+        {
+          "id": "message-81465b45-acd9-4554-a6bd-6b3f8abf28f2",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "نمیشه شاه",
+          "createdAt": 1786196430750
+        }
+      ]
+    },
+    {
+      "id": "chat-1ae019cd-4d4f-498e-ac5d-5b05cc175098",
+      "visitorName": "مسیح الله",
+      "visitorId": "visitor-1786192566384-mpul09ao",
+      "createdAt": 1786192566455,
+      "updatedAt": 1786193182889,
+      "unreadByAdmin": 0,
+      "unreadByUser": 0,
+      "messages": [
+        {
+          "id": "message-6de08558-1661-4668-be4e-9a4c47778aa3",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام مسیح الله! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+          "createdAt": 1786192566455,
+          "system": true
+        },
+        {
+          "id": "message-937b644c-4442-45e2-94f5-fc6640a2e46b",
+          "sender": "user",
+          "senderName": "مسیح الله",
+          "text": "سلام",
+          "createdAt": 1786192571534
+        },
+        {
+          "id": "message-b977bf72-dcda-496f-93fe-2c92b46d6dc4",
+          "sender": "user",
+          "senderName": "مسیح الله",
+          "text": "استی",
+          "createdAt": 1786193182889
+        }
+      ]
+    },
+    {
+      "id": "chat-77f95259-a5d1-4335-a4db-f2115a9257e2",
+      "visitorName": "xcxc",
+      "visitorId": "visitor-1786189771642-7ktj8pjf",
+      "createdAt": 1786189771584,
+      "updatedAt": 1786189798742,
+      "unreadByAdmin": 0,
+      "unreadByUser": 0,
+      "messages": [
+        {
+          "id": "message-9117330d-2a60-41a6-8b89-9fbd56b3a61c",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام xcxc! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+          "createdAt": 1786189771584,
+          "system": true
+        },
+        {
+          "id": "message-e2d8dcba-90ca-4043-a5e8-5dc9c240a8ec",
+          "sender": "user",
+          "senderName": "xcxc",
+          "text": "asdas",
+          "createdAt": 1786189781176
+        },
+        {
+          "id": "message-ff0aef7e-b69d-4b37-abc0-e5961b5fb9d1",
+          "sender": "user",
+          "senderName": "xcxc",
+          "text": "sdads",
+          "createdAt": 1786189792588
+        },
+        {
+          "id": "message-f891ab4e-cad1-43d5-a7e7-c604423ff894",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "چی یکدی شاه",
+          "createdAt": 1786189798742
+        }
+      ]
+    },
+    {
+      "id": "chat-39b062e4-c6ee-402d-8083-c8c8d70e2d98",
+      "visitorName": "مسیح الله",
+      "visitorId": "visitor-186c0950-37e8-4c8b-860a-769e4757340a",
+      "createdAt": 1786131297439,
+      "updatedAt": 1786131320221,
+      "unreadByAdmin": 0,
+      "unreadByUser": 0,
+      "messages": [
+        {
+          "id": "message-12bda717-d506-40db-be07-7b08b0e0b618",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "سلام مسیح الله! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.",
+          "createdAt": 1786131297439,
+          "system": true
+        },
+        {
+          "id": "message-cbed293f-272a-4a59-ac35-1f61d5299a0f",
+          "sender": "user",
+          "senderName": "مسیح الله",
+          "text": "سلام داداش",
+          "createdAt": 1786131304106
+        },
+        {
+          "id": "message-44380658-f293-4b9e-9a0f-22b4c6b845b1",
+          "sender": "admin",
+          "senderName": "مدیر علیمی",
+          "text": "خوبی شیرم",
+          "createdAt": 1786131320221
+        }
+      ]
+    },
     {
       "id": "chat-16747148-2d4d-4a6a-a265-043b941d6490",
       "visitorName": "مسیح الله",

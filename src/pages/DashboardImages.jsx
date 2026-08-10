@@ -23,6 +23,12 @@ import {
   showAdminSuccess,
   showAdminWarning,
 } from '../utils/adminAlert'
+import LocalizedField from '../components/LocalizedField'
+import {
+  localizedText,
+  normalizeLocalizedValue,
+  translationCompletion,
+} from '../i18n/localizedContent'
 import './DashboardImages.css'
 
 const MAX_SOURCE_IMAGE_SIZE = 2 * 1024 * 1024
@@ -33,10 +39,10 @@ const TARGET_DATA_URL_LENGTH = 520 * 1024
 const emptySlideForm = {
   id: '',
   image: '',
-  title: '',
-  subtitle: '',
-  badge: 'ALIMI PAINT',
-  alt: '',
+  title: normalizeLocalizedValue(''),
+  subtitle: normalizeLocalizedValue(''),
+  badge: normalizeLocalizedValue('ALIMI PAINT'),
+  alt: normalizeLocalizedValue(''),
   objectPosition: 'center',
   order: 1,
   active: true,
@@ -265,8 +271,13 @@ function DashboardImages() {
       return
     }
 
-    if (!slideForm.title.trim()) {
-      showAdminWarning('عنوان الزامی است.')
+    if (!localizedText(slideForm.title, 'fa').trim()) {
+      showAdminWarning('عنوان دری الزامی است.')
+      return
+    }
+
+    if (!translationCompletion(slideForm.title).complete) {
+      showAdminWarning('عنوان عکس را به هر سه زبان دری، پشتو و انگلیسی وارد کنید.')
       return
     }
 
@@ -290,10 +301,10 @@ function DashboardImages() {
       ...slideForm,
       image: finalImage,
       id: slideForm.id || `slide-${Date.now()}`,
-      title: slideForm.title.trim(),
-      subtitle: slideForm.subtitle.trim(),
-      badge: slideForm.badge.trim() || 'ALIMI PAINT',
-      alt: slideForm.alt.trim() || slideForm.title.trim(),
+      title: normalizeLocalizedValue(slideForm.title),
+      subtitle: normalizeLocalizedValue(slideForm.subtitle),
+      badge: normalizeLocalizedValue(slideForm.badge),
+      alt: normalizeLocalizedValue(slideForm.alt),
       order: Number(slideForm.order) || slides.length + 1,
       active: slideForm.active !== false,
       isActive: slideForm.active !== false,
@@ -315,7 +326,7 @@ function DashboardImages() {
   const askRemoveSlide = async (slide) => {
     const confirmed = await confirmAdminAction({
       title: 'حذف عکس داشبورد',
-      text: `آیا عکس «${slide.title || 'بدون عنوان'}» حذف شود؟ این عمل قابل برگشت نیست.`,
+      text: `آیا عکس «${localizedText(slide.title, 'fa') || 'بدون عنوان'}» حذف شود؟ این عمل قابل برگشت نیست.`,
       confirmText: 'حذف',
       cancelText: 'انصراف',
     })
@@ -362,27 +373,25 @@ function DashboardImages() {
   const saveHero = (event) => {
     event.preventDefault()
 
-    const rotatingWords = Array.isArray(heroForm.rotatingWords)
-      ? heroForm.rotatingWords
-      : String(heroForm.rotatingWords || '')
-          .split('\n')
-          .map((word) => word.trim())
-          .filter(Boolean)
+    const requiredFields = [
+      ['عنوان اصلی', heroForm.titleBefore],
+      ['عنوان نارنجی', heroForm.titleHighlight],
+      ['توضیحات', heroForm.description],
+    ]
 
-    if (!heroForm.titleBefore.trim()) {
-      showAdminWarning('عنوان اصلی الزامی است.')
-      return
-    }
+    const missing = requiredFields.find(([, value]) =>
+      !translationCompletion(value).complete,
+    )
 
-    if (!heroForm.titleHighlight.trim()) {
-      showAdminWarning('عنوان نارنجی الزامی است.')
+    if (missing) {
+      showAdminWarning(`${missing[0]} را به هر سه زبان دری، پشتو و انگلیسی وارد کنید.`)
       return
     }
 
     try {
       const saved = saveHeroContent({
         ...heroForm,
-        rotatingWords,
+        rotatingWords: normalizeLocalizedValue(heroForm.rotatingWords),
       })
 
       setHeroForm(getHeroContent(saved))
@@ -435,88 +444,74 @@ function DashboardImages() {
         </div>
 
         <form className="dashboard-admin-form" onSubmit={saveHero}>
-          <div className="dashboard-admin-grid">
-            <label>
-              <span>متن کوچک بالای عنوان</span>
-              <input
-                value={heroForm.eyebrow || ''}
-                maxLength={60}
-                onChange={(event) =>
-                  updateHeroForm('eyebrow', event.target.value)
-                }
-              />
-            </label>
+          <div className="dashboard-admin-grid dashboard-admin-localized-grid">
+            <LocalizedField
+              label="متن کوچک بالای عنوان"
+              value={heroForm.eyebrow}
+              onChange={(value) => updateHeroForm('eyebrow', value)}
+              maxLength={60}
+              showTranslationTools={false}
+            />
 
-            <label>
-              <span>بخش اول عنوان</span>
-              <input
-                value={heroForm.titleBefore || ''}
-                maxLength={35}
-                onChange={(event) =>
-                  updateHeroForm('titleBefore', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              label="بخش اول عنوان"
+              value={heroForm.titleBefore}
+              onChange={(value) => updateHeroForm('titleBefore', value)}
+              maxLength={35}
+              required
+              showTranslationTools={false}
+            />
 
-            <label>
-              <span>بخش نارنجی عنوان</span>
-              <input
-                value={heroForm.titleHighlight || ''}
-                maxLength={40}
-                onChange={(event) =>
-                  updateHeroForm('titleHighlight', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              label="بخش نارنجی عنوان"
+              value={heroForm.titleHighlight}
+              onChange={(value) => updateHeroForm('titleHighlight', value)}
+              maxLength={40}
+              required
+              showTranslationTools={false}
+            />
 
-            <label>
-              <span>متن قبل از کلمه متغیر</span>
-              <input
-                value={heroForm.changingPrefix || ''}
-                maxLength={50}
-                onChange={(event) =>
-                  updateHeroForm('changingPrefix', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              label="متن قبل از کلمه متغیر"
+              value={heroForm.changingPrefix}
+              onChange={(value) => updateHeroForm('changingPrefix', value)}
+              maxLength={50}
+              showTranslationTools={false}
+            />
 
-            <label className="is-full">
-              <span>کلمه‌های متغیر</span>
-              <textarea
-                rows={5}
-                value={
-                  Array.isArray(heroForm.rotatingWords)
-                    ? heroForm.rotatingWords.join('\n')
-                    : heroForm.rotatingWords || ''
-                }
-                onChange={(event) =>
-                  updateHeroForm('rotatingWords', event.target.value)
-                }
-              />
-              <small>هر کلمه را در یک خط جدا بنویسید.</small>
-            </label>
+            <LocalizedField
+              className="is-full"
+              label="کلمه‌های متغیر"
+              value={heroForm.rotatingWords}
+              onChange={(value) => updateHeroForm('rotatingWords', value)}
+              multiline
+              rows={5}
+              placeholder={{
+                fa: 'هر کلمه را در یک خط جدا بنویسید',
+                ps: 'هره کلمه په جلا کرښه کې ولیکئ',
+                en: 'Write each word on a separate line',
+              }}
+              showTranslationTools={false}
+            />
 
-            <label className="is-full">
-              <span>توضیحات</span>
-              <textarea
-                rows={4}
-                maxLength={220}
-                value={heroForm.description || ''}
-                onChange={(event) =>
-                  updateHeroForm('description', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              className="is-full"
+              label="توضیحات"
+              value={heroForm.description}
+              onChange={(value) => updateHeroForm('description', value)}
+              multiline
+              rows={4}
+              maxLength={220}
+              required
+              showTranslationTools={false}
+            />
 
-            <label>
-              <span>متن دکمه اصلی</span>
-              <input
-                value={heroForm.primaryButtonText || ''}
-                onChange={(event) =>
-                  updateHeroForm('primaryButtonText', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              label="متن دکمه اصلی"
+              value={heroForm.primaryButtonText}
+              onChange={(value) => updateHeroForm('primaryButtonText', value)}
+              showTranslationTools={false}
+            />
 
             <label>
               <span>لینک دکمه اصلی</span>
@@ -528,15 +523,12 @@ function DashboardImages() {
               />
             </label>
 
-            <label>
-              <span>متن دکمه دوم</span>
-              <input
-                value={heroForm.secondaryButtonText || ''}
-                onChange={(event) =>
-                  updateHeroForm('secondaryButtonText', event.target.value)
-                }
-              />
-            </label>
+            <LocalizedField
+              label="متن دکمه دوم"
+              value={heroForm.secondaryButtonText}
+              onChange={(value) => updateHeroForm('secondaryButtonText', value)}
+              showTranslationTools={false}
+            />
 
             <label>
               <span>لینک دکمه دوم</span>
@@ -598,16 +590,16 @@ function DashboardImages() {
                   <div className="dashboard-images-card-photo">
                     <img
                       src={slide.image}
-                      alt={slide.alt || slide.title}
+                      alt={localizedText(slide.alt, 'fa') || localizedText(slide.title, 'fa')}
                       style={{ objectPosition: slide.objectPosition }}
                     />
 
                     <div className="dashboard-images-card-overlay" />
 
                     <div className="dashboard-images-card-text">
-                      <small>{slide.badge}</small>
-                      <h3>{slide.title}</h3>
-                      <p>{slide.subtitle}</p>
+                      <small>{localizedText(slide.badge, 'fa')}</small>
+                      <h3>{localizedText(slide.title, 'fa')}</h3>
+                      <p>{localizedText(slide.subtitle, 'fa')}</p>
                     </div>
                   </div>
 
@@ -703,39 +695,32 @@ function DashboardImages() {
               </div>
 
               <div className="dashboard-images-fields">
-                <label>
-                  عنوان اصلی
-                  <input
-                    value={slideForm.title}
-                    maxLength={45}
-                    onChange={(event) =>
-                      updateSlideForm('title', event.target.value)
-                    }
-                  />
-                </label>
+                <LocalizedField
+                  label="عنوان اصلی"
+                  value={slideForm.title}
+                  onChange={(value) => updateSlideForm('title', value)}
+                  maxLength={45}
+                  required
+                  showTranslationTools={false}
+                />
 
-                <label>
-                  متن توضیح
-                  <textarea
-                    rows={3}
-                    value={slideForm.subtitle}
-                    maxLength={90}
-                    onChange={(event) =>
-                      updateSlideForm('subtitle', event.target.value)
-                    }
-                  />
-                </label>
+                <LocalizedField
+                  label="متن توضیح"
+                  value={slideForm.subtitle}
+                  onChange={(value) => updateSlideForm('subtitle', value)}
+                  multiline
+                  rows={3}
+                  maxLength={90}
+                  showTranslationTools={false}
+                />
 
-                <label>
-                  متن کوچک
-                  <input
-                    value={slideForm.badge}
-                    maxLength={24}
-                    onChange={(event) =>
-                      updateSlideForm('badge', event.target.value)
-                    }
-                  />
-                </label>
+                <LocalizedField
+                  label="متن کوچک"
+                  value={slideForm.badge}
+                  onChange={(value) => updateSlideForm('badge', value)}
+                  maxLength={24}
+                  showTranslationTools={false}
+                />
 
                 <label>
                   موقعیت عکس
@@ -765,16 +750,13 @@ function DashboardImages() {
                   />
                 </label>
 
-                <label>
-                  متن جایگزین عکس
-                  <input
-                    value={slideForm.alt}
-                    maxLength={80}
-                    onChange={(event) =>
-                      updateSlideForm('alt', event.target.value)
-                    }
-                  />
-                </label>
+                <LocalizedField
+                  label="متن جایگزین عکس"
+                  value={slideForm.alt}
+                  onChange={(value) => updateSlideForm('alt', value)}
+                  maxLength={80}
+                  showTranslationTools={false}
+                />
 
                 <label className="dashboard-images-check">
                   <input

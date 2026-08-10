@@ -38,11 +38,11 @@ function readData() {
   try {
     const parsed = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'))
     return {
-      settings: { ...defaultSettings, ...(parsed?.settings || {}) },
+      settings: normalizeSettings(parsed?.settings || {}),
       conversations: Array.isArray(parsed?.conversations) ? parsed.conversations : [],
     }
   } catch {
-    return { settings: { ...defaultSettings }, conversations: [] }
+    return { settings: normalizeSettings(defaultSettings), conversations: [] }
   }
 }
 
@@ -122,6 +122,51 @@ function cleanText(value, max = 5000) {
   return String(value || '').trim().slice(0, max)
 }
 
+function isLocalizedValue(value) {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value))
+}
+
+function cleanLocalizedText(value, max = 5000) {
+  if (!isLocalizedValue(value)) {
+    const text = cleanText(value, max)
+    return { fa: text, ps: '', en: '' }
+  }
+
+  return {
+    fa: cleanText(value.fa, max),
+    ps: cleanText(value.ps, max),
+    en: cleanText(value.en, max),
+  }
+}
+
+function localizedText(value, language = 'fa') {
+  if (!isLocalizedValue(value)) return cleanText(value)
+  const order = [language, 'fa', 'ps', 'en']
+  for (const code of order) {
+    const text = cleanText(value[code])
+    if (text) return text
+  }
+  return ''
+}
+
+function normalizeSettings(settings = {}) {
+  const merged = { ...defaultSettings, ...settings }
+  ;[
+    'title',
+    'statusText',
+    'namePromptTitle',
+    'namePromptText',
+    'namePlaceholder',
+    'welcomeMessage',
+    'messagePlaceholder',
+  ].forEach((field) => {
+    merged[field] = cleanLocalizedText(merged[field])
+  })
+  merged.enabled = settings?.enabled !== false
+  merged.adminName = cleanText(merged.adminName || defaultSettings.adminName, 100)
+  return merged
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`)
   const pathname = url.pathname
@@ -153,12 +198,7 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/assistant/settings' && req.method === 'POST') {
       const body = await readBody(req)
       const data = readData()
-      data.settings = {
-        ...defaultSettings,
-        ...body,
-        enabled: body?.enabled !== false,
-        adminName: cleanText(body?.adminName || defaultSettings.adminName, 100),
-      }
+      data.settings = normalizeSettings(body)
       writeData(data)
       broadcast('settings')
       return json(res, 200, snapshot(data))
@@ -168,6 +208,7 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req)
       const visitorName = cleanText(body?.visitorName, 80)
       const visitorId = cleanText(body?.visitorId, 120) || `visitor-${crypto.randomUUID()}`
+      const language = ['fa', 'ps', 'en'].includes(body?.language) ? body.language : 'fa'
       if (!visitorName) return json(res, 400, { message: 'نام کاربر ضروری است.' })
 
       const data = readData()
@@ -185,7 +226,7 @@ const server = http.createServer(async (req, res) => {
             id: `message-${crypto.randomUUID()}`,
             sender: 'admin',
             senderName: data.settings.adminName,
-            text: data.settings.welcomeMessage.replaceAll('{name}', visitorName),
+            text: localizedText(data.settings.welcomeMessage, language).replaceAll('{name}', visitorName),
             createdAt: now,
             system: true,
           },

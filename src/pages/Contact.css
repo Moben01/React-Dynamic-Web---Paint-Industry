@@ -273,6 +273,35 @@
   gap: 85px;
 }
 
+.contact-shell[dir='ltr'] .contact-hero-copy,
+.contact-shell[dir='ltr'] .contact-form-intro,
+.contact-shell[dir='ltr'] .contact-location-copy {
+  text-align: left;
+}
+
+.contact-shell[dir='ltr'] .contact-hero-copy,
+.contact-shell[dir='ltr'] .contact-form-intro,
+.contact-shell[dir='ltr'] .contact-location-copy {
+  grid-column: 1;
+}
+
+.contact-shell[dir='ltr'] .contact-orbit-visual,
+.contact-shell[dir='ltr'] .contact-form-card,
+.contact-shell[dir='ltr'] .contact-map-card {
+  grid-column: 2;
+}
+
+@media (max-width: 980px) {
+  .contact-shell[dir='ltr'] .contact-hero-copy,
+  .contact-shell[dir='ltr'] .contact-form-intro,
+  .contact-shell[dir='ltr'] .contact-location-copy,
+  .contact-shell[dir='ltr'] .contact-orbit-visual,
+  .contact-shell[dir='ltr'] .contact-form-card,
+  .contact-shell[dir='ltr'] .contact-map-card {
+    grid-column: 1;
+  }
+}
+
 .contact-kicker {
   display: inline-flex;
   align-items: center;

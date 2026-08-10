@@ -1,3 +1,5 @@
+import { localizedText, normalizeLocalizedValue } from '../i18n/localizedContent'
+
 const SETTINGS_KEY = 'alimi-assistant-settings-v3'
 const CONVERSATIONS_KEY = 'alimi-assistant-conversations-v3'
 const VISITOR_KEY = 'alimi-assistant-visitor-v3'
@@ -14,6 +16,35 @@ export const defaultAssistantSettings = {
   namePlaceholder: 'نام شما...',
   welcomeMessage: 'سلام {name}! خوش آمدید. پیام خود را بنویسید؛ همکاران علیمی پاسخ می‌دهند.',
   messagePlaceholder: 'پیام خود را بنویسید...',
+}
+
+const localizedSettingFields = [
+  'title',
+  'statusText',
+  'namePromptTitle',
+  'namePromptText',
+  'namePlaceholder',
+  'welcomeMessage',
+  'messagePlaceholder',
+]
+
+function normalizeAssistantSettings(settings = {}) {
+  const merged = {
+    ...defaultAssistantSettings,
+    ...settings,
+    enabled: settings?.enabled !== false,
+  }
+
+  localizedSettingFields.forEach((field) => {
+    merged[field] = normalizeLocalizedValue(merged[field], 'fa')
+  })
+
+  merged.adminName = String(merged.adminName || defaultAssistantSettings.adminName)
+  return merged
+}
+
+export function assistantSettingText(settings, field, language = 'fa') {
+  return localizedText(settings?.[field], language)
 }
 
 function safeParse(value, fallback) {
@@ -68,7 +99,7 @@ function writeCache(snapshot, detail = {}) {
   if (snapshot?.settings) {
     localStorage.setItem(
       SETTINGS_KEY,
-      JSON.stringify({ ...defaultAssistantSettings, ...snapshot.settings }),
+      JSON.stringify(normalizeAssistantSettings(snapshot.settings)),
     )
   }
   if (snapshot?.conversations) {
@@ -99,9 +130,9 @@ async function request(path = '', options = {}) {
 }
 
 export function getAssistantSettings() {
-  if (typeof window === 'undefined') return { ...defaultAssistantSettings }
+  if (typeof window === 'undefined') return normalizeAssistantSettings(defaultAssistantSettings)
   const saved = safeParse(localStorage.getItem(SETTINGS_KEY), {})
-  return { ...defaultAssistantSettings, ...saved }
+  return normalizeAssistantSettings(saved)
 }
 
 export function getAssistantConversations() {
@@ -123,11 +154,7 @@ export async function syncAssistantFromServer({ silent = false } = {}) {
 }
 
 export async function saveAssistantSettings(nextSettings) {
-  const normalized = {
-    ...defaultAssistantSettings,
-    ...nextSettings,
-    enabled: nextSettings?.enabled !== false,
-  }
+  const normalized = normalizeAssistantSettings(nextSettings)
 
   // Optimistic local update.
   writeCache({ settings: normalized }, { type: 'settings' })
@@ -150,7 +177,7 @@ function createVisitorId() {
   return `visitor-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 }
 
-export async function createAssistantConversation(visitorName) {
+export async function createAssistantConversation(visitorName, language = 'fa') {
   const name = String(visitorName || '').trim()
   if (!name) return null
   const currentVisitor = getAssistantVisitor()
@@ -159,7 +186,7 @@ export async function createAssistantConversation(visitorName) {
   try {
     const payload = await request('/conversations', {
       method: 'POST',
-      body: JSON.stringify({ visitorName: name, visitorId }),
+      body: JSON.stringify({ visitorName: name, visitorId, language }),
     })
     writeCache(payload, { type: 'conversation-create' })
     const conversation = payload?.conversation || null
@@ -184,7 +211,7 @@ export async function createAssistantConversation(visitorName) {
           id: `local-welcome-${now}`,
           sender: 'admin',
           senderName: settings.adminName,
-          text: settings.welcomeMessage.replaceAll('{name}', name),
+          text: assistantSettingText(settings, 'welcomeMessage', language).replaceAll('{name}', name),
           createdAt: now,
           system: true,
         },

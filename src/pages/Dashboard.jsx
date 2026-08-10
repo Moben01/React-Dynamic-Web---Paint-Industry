@@ -33,6 +33,8 @@ import {
   X,
 } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useLanguage } from '../i18n/LanguageContext'
+import { localizedText } from '../i18n/localizedContent'
 import './Dashboard.css'
 import ProjectArchive from './ProjectArchive'
 
@@ -108,6 +110,7 @@ const sideCardVariants = {
 }
 
 function Dashboard() {
+  const { language, direction, t } = useLanguage()
   const [wordIndex, setWordIndex] = useState(0)
   const [activeSlide, setActiveSlide] = useState(0)
   const [heroContent, setHeroContent] = useState(
@@ -135,14 +138,14 @@ function Dashboard() {
       .sort((a, b) => Number(a.order || 0) - Number(b.order || 0))
       .map((category) => ({
         id: category.id,
-        title: category.label,
-        subtitle: category.description || '',
+        title: localizedText(category.label, language),
+        subtitle: localizedText(category.description, language),
         image: category.image || '',
         count: `${activeProducts.filter(
           (product) => String(product.category) === String(category.id),
-        ).length} محصول`,
+        ).length} ${t('dashboard.productCount', 'محصول')}`, 
       }))
-  }, [productsData])
+  }, [language, productsData, t])
 
   const sliderRef = useRef(null)
 
@@ -181,10 +184,15 @@ function Dashboard() {
     }
   }, [activeCategory, productCategories.length])
 
-  const rotatingWords =
-    heroContent.rotatingWords?.length
-      ? heroContent.rotatingWords
-      : ['کیفیت']
+  const rotatingWordsText = localizedText(heroContent.rotatingWords, language)
+  const rotatingWords = rotatingWordsText
+    .split('\n')
+    .map((word) => word.trim())
+    .filter(Boolean)
+
+  if (!rotatingWords.length) {
+    rotatingWords.push(t('dashboard.qualityFallback', 'کیفیت'))
+  }
 
   useEffect(() => {
     if (rotatingWords.length <= 1) {
@@ -342,7 +350,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="dashboard-shell">
+    <div className="dashboard-shell" dir={direction}>
 
 
       <main className="dashboard-page">
@@ -362,7 +370,7 @@ function Dashboard() {
                 transition={{ duration: 0.45 }}
               >
                 <Sparkles size={17} />
-                {heroContent.eyebrow}
+                {localizedText(heroContent.eyebrow, language)}
               </motion.div>
 
               <motion.h1
@@ -373,16 +381,16 @@ function Dashboard() {
                   delay: 0.15,
                 }}
               >
-                {heroContent.titleBefore}{' '}
+                {localizedText(heroContent.titleBefore, language)}{' '}
 
                 <span>
-                  {heroContent.titleHighlight}
+                  {localizedText(heroContent.titleHighlight, language)}
                 </span>
               </motion.h1>
 
               <div className="dashboard-changing-text">
                 <span>
-                  {heroContent.changingPrefix}
+                  {localizedText(heroContent.changingPrefix, language)}
                 </span>
 
                 <span
@@ -394,7 +402,7 @@ function Dashboard() {
               </div>
 
               <p className="dashboard-description">
-                {heroContent.description}
+                {localizedText(heroContent.description, language)}
               </p>
 
               <div className="dashboard-actions">
@@ -402,7 +410,7 @@ function Dashboard() {
                   className="dashboard-primary-button"
                   href={heroContent.primaryButtonLink}
                 >
-                  {heroContent.primaryButtonText}
+                  {localizedText(heroContent.primaryButtonText, language)}
                   <ArrowLeft size={18} />
                 </a>
 
@@ -410,7 +418,7 @@ function Dashboard() {
                   className="dashboard-secondary-button"
                   href={heroContent.secondaryButtonLink}
                 >
-                  {heroContent.secondaryButtonText}
+                  {localizedText(heroContent.secondaryButtonText, language)}
                 </a>
               </div>
             </div>
@@ -430,7 +438,7 @@ function Dashboard() {
                   type="button"
                   className="collection-navigation collection-previous"
                   onClick={previousSlide}
-                  aria-label="عکس قبلی"
+                  aria-label={t('dashboard.previousImage', 'عکس قبلی')}
                 >
                   <ArrowRight size={21} />
                 </button>
@@ -447,7 +455,7 @@ function Dashboard() {
                     >
                       <img
                         src={item.image}
-                        alt={item.alt || item.title}
+                        alt={localizedText(item.alt, language) || localizedText(item.title, language)}
                         loading={index === 0 ? 'eager' : 'lazy'}
                         className="collection-slide-image"
                         style={{
@@ -470,9 +478,9 @@ function Dashboard() {
                       <div className="collection-image-overlay" />
 
                       <div className="collection-slide-content">
-                        <span>{item.badge || 'ALIMI PAINT'}</span>
-                        <h2>{item.title}</h2>
-                        <p>{item.subtitle}</p>
+                        <span>{localizedText(item.badge, language) || 'ALIMI PAINT'}</span>
+                        <h2>{localizedText(item.title, language)}</h2>
+                        <p>{localizedText(item.subtitle, language)}</p>
                       </div>
                     </article>
                   ))}
@@ -482,7 +490,7 @@ function Dashboard() {
                   type="button"
                   className="collection-navigation collection-next"
                   onClick={nextSlide}
-                  aria-label="عکس بعدی"
+                  aria-label={t('dashboard.nextImage', 'عکس بعدی')}
                 >
                   <ArrowLeft size={21} />
                 </button>
@@ -499,7 +507,7 @@ function Dashboard() {
                         : 'collection-dot'
                     }
                     onClick={() => scrollToSlide(index)}
-                    aria-label={`نمایش تصویر ${index + 1}`}
+                    aria-label={`${t('dashboard.showImage', 'نمایش تصویر')} ${index + 1}`}
                   />
                 ))}
               </div>
@@ -551,18 +559,17 @@ function Dashboard() {
                 </div>
 
                 <span className="product-category-small-title">
-                  محصولات شرکت علیمی
+                  {t('dashboard.companyProducts', 'محصولات شرکت علیمی')}
                 </span>
 
                 <h2>
-                  دسته‌بندی
+                  {t('dashboard.categoryTitle', 'دسته‌بندی')}
                   <br />
-                  <span>محصولات</span>
+                  <span>{t('dashboard.productsTitle', 'محصولات')}</span>
                 </h2>
 
                 <p>
-                  برای مشاهده محصولات هر دسته، موس خود را روی
-                  عنوان کتگوری قرار دهید.
+                  {t('dashboard.categoryHint', 'برای مشاهده محصولات هر دسته، موس خود را روی عنوان کتگوری قرار دهید.')}
                 </p>
               </motion.div>
 
@@ -651,7 +658,7 @@ function Dashboard() {
                                 productCategories[activeCategory]?.id || '',
                               )}`}
                             >
-                              مشاهده محصولات
+                              {t('dashboard.viewProducts', 'مشاهده محصولات')}
                               <ArrowLeft size={18} />
                             </Link>
                           </div>
@@ -670,7 +677,7 @@ function Dashboard() {
                   </>
                 ) : (
                   <div className="product-category-empty">
-                    هنوز کتگوری فعالی ثبت نشده است.
+                    {t('dashboard.noActiveCategories', 'هنوز کتگوری فعالی ثبت نشده است.')}
                   </div>
                 )}
               </div>

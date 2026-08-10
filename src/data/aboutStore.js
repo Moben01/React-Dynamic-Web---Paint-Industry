@@ -1,3 +1,5 @@
+import { normalizeLocalizedValue } from '../i18n/localizedContent'
+
 export const ABOUT_STORAGE_KEY =
   'alimi-about-data-v1'
 
@@ -302,160 +304,186 @@ export const defaultAboutData = {
 const clone = (value) =>
   JSON.parse(JSON.stringify(value))
 
+const localize = (value) =>
+  normalizeLocalizedValue(value)
+
+function normalizeBackgroundImages(images) {
+  return (Array.isArray(images) ? images : []).map((item, index) => ({
+    ...item,
+    id: item?.id || `about-bg-${index + 1}`,
+    url: String(item?.url || ''),
+    alt: localize(item?.alt || ''),
+    active: item?.active !== false,
+    order: Number(item?.order) || index + 1,
+  }))
+}
+
+export function normalizeAboutData(source) {
+  const saved = source && typeof source === 'object' ? source : {}
+  const defaults = clone(defaultAboutData)
+
+  const legacyBackgroundImages =
+    Array.isArray(saved.intro?.backgroundImages) && saved.intro.backgroundImages.length
+      ? saved.intro.backgroundImages
+      : saved.intro?.largeImage
+        ? [
+            {
+              id: 'about-bg-legacy',
+              url: saved.intro.largeImage,
+              alt: saved.intro.largeImageAlt || 'تصویر درباره ما',
+              active: true,
+              order: 1,
+            },
+            ...defaults.intro.backgroundImages.slice(1),
+          ]
+        : defaults.intro.backgroundImages
+
+  const visionStats = Array.isArray(saved.vision?.stats)
+    ? saved.vision.stats
+    : defaults.vision.stats
+
+  const timeline = Array.isArray(saved.story?.timeline)
+    ? saved.story.timeline
+    : defaults.story.timeline
+
+  const values = Array.isArray(saved.values)
+    ? saved.values
+    : defaults.values
+
+  const checklist = Array.isArray(saved.factory?.checklist)
+    ? saved.factory.checklist
+    : defaults.factory.checklist
+
+  return {
+    ...defaults,
+    ...saved,
+
+    intro: {
+      ...defaults.intro,
+      ...(saved.intro || {}),
+      kicker: localize(saved.intro?.kicker ?? defaults.intro.kicker),
+      title: localize(saved.intro?.title ?? defaults.intro.title),
+      highlight: localize(saved.intro?.highlight ?? defaults.intro.highlight),
+      description: localize(saved.intro?.description ?? defaults.intro.description),
+      buttonText: localize(saved.intro?.buttonText ?? defaults.intro.buttonText),
+      backgroundImages: normalizeBackgroundImages(legacyBackgroundImages),
+      backgroundInterval: Math.max(
+        3000,
+        Number(saved.intro?.backgroundInterval ?? defaults.intro.backgroundInterval) || 5000,
+      ),
+    },
+
+    vision: {
+      ...defaults.vision,
+      ...(saved.vision || {}),
+      kicker: localize(saved.vision?.kicker ?? defaults.vision.kicker),
+      title: localize(saved.vision?.title ?? defaults.vision.title),
+      stats: visionStats.map((stat, index) => ({
+        ...stat,
+        id: stat?.id || `vision-stat-${index + 1}`,
+        value: localize(stat?.value ?? ''),
+        label: localize(stat?.label ?? ''),
+      })),
+    },
+
+    story: {
+      ...defaults.story,
+      ...(saved.story || {}),
+      kicker: localize(saved.story?.kicker ?? defaults.story.kicker),
+      title: localize(saved.story?.title ?? defaults.story.title),
+      highlight: localize(saved.story?.highlight ?? defaults.story.highlight),
+      description: localize(saved.story?.description ?? defaults.story.description),
+      timeline: timeline.map((item, index) => ({
+        ...item,
+        id: item?.id || `timeline-${index + 1}`,
+        year: localize(item?.year ?? ''),
+        title: localize(item?.title ?? ''),
+        description: localize(item?.description ?? ''),
+      })),
+    },
+
+    valuesSection: {
+      ...defaults.valuesSection,
+      ...(saved.valuesSection || {}),
+      kicker: localize(saved.valuesSection?.kicker ?? defaults.valuesSection.kicker),
+      title: localize(saved.valuesSection?.title ?? defaults.valuesSection.title),
+      highlight: localize(saved.valuesSection?.highlight ?? defaults.valuesSection.highlight),
+      description: localize(saved.valuesSection?.description ?? defaults.valuesSection.description),
+    },
+
+    values: values.map((item, index) => ({
+      ...item,
+      id: item?.id || `value-${index + 1}`,
+      title: localize(item?.title ?? ''),
+      description: localize(item?.description ?? ''),
+      active: item?.active !== false,
+      order: Number(item?.order) || index + 1,
+    })),
+
+    factory: {
+      ...defaults.factory,
+      ...(saved.factory || {}),
+      image: String(saved.factory?.image ?? defaults.factory.image),
+      imageAlt: localize(saved.factory?.imageAlt ?? defaults.factory.imageAlt),
+      kicker: localize(saved.factory?.kicker ?? defaults.factory.kicker),
+      title: localize(saved.factory?.title ?? defaults.factory.title),
+      highlight: localize(saved.factory?.highlight ?? defaults.factory.highlight),
+      description: localize(saved.factory?.description ?? defaults.factory.description),
+      checklist: checklist.map((item, index) => ({
+        ...item,
+        id: item?.id || `factory-item-${index + 1}`,
+        text: localize(item?.text ?? ''),
+      })),
+    },
+
+    contact: {
+      ...defaults.contact,
+      ...(saved.contact || {}),
+      kicker: localize(saved.contact?.kicker ?? defaults.contact.kicker),
+      title: localize(saved.contact?.title ?? defaults.contact.title),
+      description: localize(saved.contact?.description ?? defaults.contact.description),
+      buttonText: localize(saved.contact?.buttonText ?? defaults.contact.buttonText),
+      phone: String(saved.contact?.phone ?? defaults.contact.phone),
+    },
+  }
+}
+
 export function loadAboutData() {
   try {
     const saved = JSON.parse(
-      localStorage.getItem(
-        ABOUT_STORAGE_KEY,
-      ) || 'null',
+      localStorage.getItem(ABOUT_STORAGE_KEY) || 'null',
     )
 
-    if (
-      !saved ||
-      typeof saved !== 'object'
-    ) {
-      return clone(defaultAboutData)
-    }
-
-    return {
-      ...clone(defaultAboutData),
-      ...saved,
-
-      intro: {
-        ...clone(defaultAboutData.intro),
-        ...(saved.intro || {}),
-        backgroundImages:
-          Array.isArray(saved.intro?.backgroundImages) &&
-          saved.intro.backgroundImages.length
-            ? saved.intro.backgroundImages
-            : saved.intro?.largeImage
-              ? [
-                  {
-                    id: 'about-bg-legacy',
-                    url: saved.intro.largeImage,
-                    alt: saved.intro.largeImageAlt || 'تصویر درباره ما',
-                    active: true,
-                    order: 1,
-                  },
-                  ...clone(defaultAboutData.intro.backgroundImages).slice(1),
-                ]
-              : clone(defaultAboutData.intro.backgroundImages),
-      },
-
-      vision: {
-        ...clone(
-          defaultAboutData.vision,
-        ),
-        ...(saved.vision || {}),
-
-        stats: Array.isArray(
-          saved.vision?.stats,
-        )
-          ? saved.vision.stats
-          : clone(
-              defaultAboutData.vision
-                .stats,
-            ),
-      },
-
-      story: {
-        ...clone(
-          defaultAboutData.story,
-        ),
-        ...(saved.story || {}),
-
-        timeline: Array.isArray(
-          saved.story?.timeline,
-        )
-          ? saved.story.timeline
-          : clone(
-              defaultAboutData.story
-                .timeline,
-            ),
-      },
-
-      valuesSection: {
-        ...clone(
-          defaultAboutData
-            .valuesSection,
-        ),
-        ...(saved.valuesSection || {}),
-      },
-
-      values: Array.isArray(
-        saved.values,
-      )
-        ? saved.values
-        : clone(
-            defaultAboutData.values,
-          ),
-
-      factory: {
-        ...clone(
-          defaultAboutData.factory,
-        ),
-        ...(saved.factory || {}),
-
-        checklist: Array.isArray(
-          saved.factory?.checklist,
-        )
-          ? saved.factory.checklist
-          : clone(
-              defaultAboutData.factory
-                .checklist,
-            ),
-      },
-
-      contact: {
-        ...clone(
-          defaultAboutData.contact,
-        ),
-        ...(saved.contact || {}),
-      },
-    }
+    return normalizeAboutData(saved || defaultAboutData)
   } catch (error) {
-    console.error(
-      'Unable to load About data:',
-      error,
-    )
-
-    return clone(defaultAboutData)
+    console.error('Unable to load About data:', error)
+    return normalizeAboutData(defaultAboutData)
   }
 }
 
 export function saveAboutData(data) {
-  if (
-    !data ||
-    typeof data !== 'object'
-  ) {
-    throw new Error(
-      'About data must be an object.',
-    )
+  if (!data || typeof data !== 'object') {
+    throw new Error('About data must be an object.')
   }
+
+  const normalized = normalizeAboutData(data)
 
   localStorage.setItem(
     ABOUT_STORAGE_KEY,
-    JSON.stringify(data),
+    JSON.stringify(normalized),
   )
 
   window.dispatchEvent(
-    new CustomEvent(
-      ABOUT_CHANGED_EVENT,
-      {
-        detail: data,
-      },
-    ),
+    new CustomEvent(ABOUT_CHANGED_EVENT, {
+      detail: normalized,
+    }),
   )
 
-  return data
+  return normalized
 }
 
 export function resetAboutData() {
-  const data = clone(
-    defaultAboutData,
-  )
-
+  const data = normalizeAboutData(defaultAboutData)
   saveAboutData(data)
-
   return data
 }

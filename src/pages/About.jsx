@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowLeft,
+  ArrowRight,
   Award,
   Check,
   Factory,
@@ -18,6 +19,8 @@ import {
   ABOUT_CHANGED_EVENT,
   loadAboutData,
 } from '../data/aboutStore'
+import { useLanguage } from '../i18n/LanguageContext'
+import { localizedText } from '../i18n/localizedContent'
 import './About.css'
 
 const valueIconMap = {
@@ -29,29 +32,39 @@ const valueIconMap = {
   users: Users,
 }
 
+const staticText = {
+  fa: {
+    backgroundImages: 'تصاویر پس‌زمینه',
+    showImage: 'نمایش تصویر',
+  },
+  ps: {
+    backgroundImages: 'د شالید انځورونه',
+    showImage: 'انځور ښکاره کړئ',
+  },
+  en: {
+    backgroundImages: 'Background images',
+    showImage: 'Show image',
+  },
+}
+
 function About() {
+  const { language, direction } = useLanguage()
+  const ui = staticText[language] || staticText.fa
   const [pageData, setPageData] = useState(loadAboutData)
+  const [backgroundIndex, setBackgroundIndex] = useState(0)
+
+  const text = (value) => localizedText(value, language)
 
   useEffect(() => {
-    const refreshData = () => {
-      setPageData(loadAboutData())
-    }
-
-    window.addEventListener(
-      ABOUT_CHANGED_EVENT,
-      refreshData,
-    )
+    const refreshData = () => setPageData(loadAboutData())
+    window.addEventListener(ABOUT_CHANGED_EVENT, refreshData)
     window.addEventListener('storage', refreshData)
+    window.addEventListener('focus', refreshData)
 
     return () => {
-      window.removeEventListener(
-        ABOUT_CHANGED_EVENT,
-        refreshData,
-      )
-      window.removeEventListener(
-        'storage',
-        refreshData,
-      )
+      window.removeEventListener(ABOUT_CHANGED_EVENT, refreshData)
+      window.removeEventListener('storage', refreshData)
+      window.removeEventListener('focus', refreshData)
     }
   }, [])
 
@@ -65,8 +78,6 @@ function About() {
         ),
     [pageData.intro.backgroundImages],
   )
-
-  const [backgroundIndex, setBackgroundIndex] = useState(0)
 
   useEffect(() => {
     setBackgroundIndex(0)
@@ -92,14 +103,15 @@ function About() {
         .filter((item) => item.active !== false)
         .sort(
           (first, second) =>
-            Number(first.order || 0) -
-            Number(second.order || 0),
+            Number(first.order || 0) - Number(second.order || 0),
         ),
     [pageData.values],
   )
 
+  const StoryArrow = direction === 'ltr' ? ArrowRight : ArrowLeft
+
   return (
-    <div className="about-shell">
+    <div className="about-shell" dir={direction}>
       <main className="about-page">
         <section className="about-intro">
           <div className="about-intro-backgrounds" aria-hidden="true">
@@ -117,6 +129,8 @@ function About() {
                   scale: { duration: 7, ease: 'linear' },
                 }}
                 style={{ backgroundImage: `url(${item.url})` }}
+                role="img"
+                aria-label={text(item.alt)}
               />
             ))}
           </div>
@@ -134,30 +148,30 @@ function About() {
             >
               <span className="about-kicker">
                 <Sparkles size={17} />
-                {pageData.intro.kicker}
+                {text(pageData.intro.kicker)}
               </span>
 
               <h1>
-                {pageData.intro.title}
-                <span> {pageData.intro.highlight}</span>
+                {text(pageData.intro.title)}
+                <span> {text(pageData.intro.highlight)}</span>
               </h1>
 
-              <p>{pageData.intro.description}</p>
+              <p>{text(pageData.intro.description)}</p>
 
               <a href="#story" className="about-read-story">
-                {pageData.intro.buttonText}
-                <ArrowLeft size={18} />
+                {text(pageData.intro.buttonText)}
+                <StoryArrow size={18} />
               </a>
 
               {backgroundImages.length > 1 && (
-                <div className="about-intro-dots" aria-label="تصاویر پس‌زمینه">
+                <div className="about-intro-dots" aria-label={ui.backgroundImages}>
                   {backgroundImages.map((item, index) => (
                     <button
                       type="button"
                       key={item.id || `${item.url}-${index}`}
                       className={index === backgroundIndex ? 'active' : ''}
                       onClick={() => setBackgroundIndex(index)}
-                      aria-label={`نمایش تصویر ${index + 1}`}
+                      aria-label={`${ui.showImage} ${index + 1}`}
                     />
                   ))}
                 </div>
@@ -172,20 +186,17 @@ function About() {
               className="about-statement-card"
               initial={{ opacity: 0, y: 35 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{
-                once: true,
-                amount: 0.25,
-              }}
+              viewport={{ once: true, amount: 0.25 }}
               transition={{ duration: 0.65 }}
             >
-              <span>{pageData.vision.kicker}</span>
-              <h2>{pageData.vision.title}</h2>
+              <span>{text(pageData.vision.kicker)}</span>
+              <h2>{text(pageData.vision.title)}</h2>
 
               <div className="about-statement-meta">
                 {pageData.vision.stats.map((stat) => (
                   <div key={stat.id}>
-                    <strong>{stat.value}</strong>
-                    <small>{stat.label}</small>
+                    <strong>{text(stat.value)}</strong>
+                    <small>{text(stat.label)}</small>
                   </div>
                 ))}
               </div>
@@ -193,130 +204,78 @@ function About() {
           </div>
         </section>
 
-        <section
-          className="about-story-section"
-          id="story"
-        >
+        <section className="about-story-section" id="story">
           <div className="about-container about-story-layout">
             <div className="about-story-heading">
               <span className="about-kicker">
                 <Factory size={17} />
-                {pageData.story.kicker}
+                {text(pageData.story.kicker)}
               </span>
 
               <h2>
-                {pageData.story.title}
-                <span>
-                  {' '}
-                  {pageData.story.highlight}
-                </span>
+                {text(pageData.story.title)}
+                <span> {text(pageData.story.highlight)}</span>
               </h2>
 
-              <p>{pageData.story.description}</p>
+              <p>{text(pageData.story.description)}</p>
             </div>
 
             <div className="about-timeline">
-              {pageData.story.timeline.map(
-                (item, index) => (
-                  <motion.article
-                    key={item.id}
-                    initial={{
-                      opacity: 0,
-                      x: -25,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      x: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                      amount: 0.2,
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.08,
-                    }}
-                  >
-                    <span className="about-timeline-year">
-                      {item.year}
-                    </span>
-
-                    <div>
-                      <h3>{item.title}</h3>
-                      <p>{item.description}</p>
-                    </div>
-                  </motion.article>
-                ),
-              )}
+              {pageData.story.timeline.map((item, index) => (
+                <motion.article
+                  key={item.id}
+                  initial={{ opacity: 0, x: direction === 'ltr' ? 25 : -25 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
+                >
+                  <span className="about-timeline-year">{text(item.year)}</span>
+                  <div>
+                    <h3>{text(item.title)}</h3>
+                    <p>{text(item.description)}</p>
+                  </div>
+                </motion.article>
+              ))}
             </div>
           </div>
         </section>
 
-        <section
-          className="about-values-section"
-          id="values"
-        >
+        <section className="about-values-section" id="values">
           <div className="about-container">
             <div className="about-values-top">
               <div>
                 <span className="about-kicker">
                   <Users size={17} />
-                  {pageData.valuesSection.kicker}
+                  {text(pageData.valuesSection.kicker)}
                 </span>
 
                 <h2>
-                  {pageData.valuesSection.title}
-                  <span>
-                    {' '}
-                    {pageData.valuesSection.highlight}
-                  </span>
+                  {text(pageData.valuesSection.title)}
+                  <span> {text(pageData.valuesSection.highlight)}</span>
                 </h2>
               </div>
 
-              <p>
-                {pageData.valuesSection.description}
-              </p>
+              <p>{text(pageData.valuesSection.description)}</p>
             </div>
 
             <div className="about-values-grid">
               {visibleValues.map((item, index) => {
-                const Icon =
-                  valueIconMap[item.icon] ||
-                  ShieldCheck
+                const Icon = valueIconMap[item.icon] || ShieldCheck
 
                 return (
                   <motion.article
                     key={item.id}
-                    initial={{
-                      opacity: 0,
-                      y: 28,
-                    }}
-                    whileInView={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    viewport={{
-                      once: true,
-                      amount: 0.2,
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      delay: index * 0.07,
-                    }}
+                    initial={{ opacity: 0, y: 28 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.5, delay: index * 0.07 }}
                   >
                     <span className="about-value-index">
-                      {String(index + 1).padStart(
-                        2,
-                        '0',
-                      )}
+                      {String(index + 1).padStart(2, '0')}
                     </span>
-
-                    <div className="about-value-icon">
-                      <Icon size={25} />
-                    </div>
-
-                    <h3>{item.title}</h3>
-                    <p>{item.description}</p>
+                    <div className="about-value-icon"><Icon size={25} /></div>
+                    <h3>{text(item.title)}</h3>
+                    <p>{text(item.description)}</p>
                   </motion.article>
                 )
               })}
@@ -327,63 +286,46 @@ function About() {
         <section className="about-factory-section">
           <div className="about-container about-factory-layout">
             <div className="about-factory-image">
-              <img
-                src={pageData.factory.image}
-                alt={pageData.factory.imageAlt}
-              />
+              <img src={pageData.factory.image} alt={text(pageData.factory.imageAlt)} />
               <span />
             </div>
 
             <div className="about-factory-content">
               <span className="about-kicker">
                 <Palette size={17} />
-                {pageData.factory.kicker}
+                {text(pageData.factory.kicker)}
               </span>
 
               <h2>
-                {pageData.factory.title}
-                <span>
-                  {' '}
-                  {pageData.factory.highlight}
-                </span>
+                {text(pageData.factory.title)}
+                <span> {text(pageData.factory.highlight)}</span>
               </h2>
 
-              <p>{pageData.factory.description}</p>
+              <p>{text(pageData.factory.description)}</p>
 
               <ul>
-                {pageData.factory.checklist.map(
-                  (item) => (
-                    <li key={item.id}>
-                      <Check size={17} />
-                      {item.text}
-                    </li>
-                  ),
-                )}
+                {pageData.factory.checklist.map((item) => (
+                  <li key={item.id}>
+                    <Check size={17} />
+                    {text(item.text)}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
         </section>
 
-        <section
-          className="about-contact-section"
-          id="contact"
-        >
+        <section className="about-contact-section" id="contact">
           <div className="about-container">
             <div className="about-contact-card">
               <div>
-                <span>
-                  {pageData.contact.kicker}
-                </span>
-                <h2>{pageData.contact.title}</h2>
-                <p>
-                  {pageData.contact.description}
-                </p>
+                <span>{text(pageData.contact.kicker)}</span>
+                <h2>{text(pageData.contact.title)}</h2>
+                <p>{text(pageData.contact.description)}</p>
               </div>
 
-              <a
-                href={`tel:${pageData.contact.phone}`}
-              >
-                {pageData.contact.buttonText}
+              <a href={`tel:${pageData.contact.phone}`}>
+                {text(pageData.contact.buttonText)}
                 <Phone size={18} />
               </a>
             </div>

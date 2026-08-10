@@ -14,14 +14,23 @@ import {
   showAdminSuccess,
   showAdminWarning,
 } from '../utils/adminAlert'
+import LocalizedField from '../components/LocalizedField'
+import {
+  createLocalizedValue,
+  isLocalizedValue,
+  localizedText,
+  normalizeLocalizedValue,
+} from '../i18n/localizedContent'
 import './ContactAdmin.css'
 
+const L = () => createLocalizedValue()
+
 const emptyItem = {
-  id: '', icon: 'mail', title: '', value: '', note: '', href: '', active: true, order: 1,
+  id: '', icon: 'mail', title: L(), value: L(), note: L(), href: '', active: true, order: 1,
 }
 
 const emptyPhone = {
-  id: '', label: '', number: '', note: '', active: true, order: 1,
+  id: '', label: L(), number: '', note: L(), whatsapp: false, active: true, order: 1,
 }
 
 const heroLabels = {
@@ -123,18 +132,23 @@ function ContactAdmin() {
   const saveCurrent = () => persist(data, 'تغییرات صفحه تماس ذخیره شد.')
 
   const openNewItem = () => {
-    setItemDraft({ ...emptyItem, order: data.contactItems.length + 1 })
+    setItemDraft({ ...emptyItem, title: L(), value: L(), note: L(), order: data.contactItems.length + 1 })
     setItemModal(true)
   }
 
   const openEditItem = (item) => {
-    setItemDraft({ ...item })
+    setItemDraft({
+      ...item,
+      title: normalizeLocalizedValue(item.title),
+      value: normalizeLocalizedValue(item.value),
+      note: normalizeLocalizedValue(item.note),
+    })
     setItemModal(true)
   }
 
   const saveItem = (event) => {
     event.preventDefault()
-    if (!itemDraft.title.trim()) {
+    if (!localizedText(itemDraft.title, 'fa').trim()) {
       showAdminWarning('عنوان راه تماس الزامی است.')
       return
     }
@@ -142,9 +156,9 @@ function ContactAdmin() {
     const record = {
       ...itemDraft,
       id: itemDraft.id || `contact-item-${Date.now()}`,
-      title: itemDraft.title.trim(),
-      value: itemDraft.value.trim(),
-      note: itemDraft.note.trim(),
+      title: normalizeLocalizedValue(itemDraft.title),
+      value: normalizeLocalizedValue(itemDraft.value),
+      note: normalizeLocalizedValue(itemDraft.note),
       href: itemDraft.href.trim(),
       active: itemDraft.active !== false,
       order: Number(itemDraft.order) || data.contactItems.length + 1,
@@ -177,12 +191,16 @@ function ContactAdmin() {
   }
 
   const openNewPhone = () => {
-    setPhoneDraft({ ...emptyPhone, order: (data.phones?.length || 0) + 1 })
+    setPhoneDraft({ ...emptyPhone, label: L(), note: L(), order: (data.phones?.length || 0) + 1 })
     setPhoneModal(true)
   }
 
   const openEditPhone = (phone) => {
-    setPhoneDraft({ ...phone })
+    setPhoneDraft({
+      ...phone,
+      label: normalizeLocalizedValue(phone.label),
+      note: normalizeLocalizedValue(phone.note),
+    })
     setPhoneModal(true)
   }
 
@@ -196,16 +214,26 @@ function ContactAdmin() {
     const record = {
       ...phoneDraft,
       id: phoneDraft.id || `phone-${Date.now()}`,
-      label: phoneDraft.label.trim() || 'شماره تماس',
+      label: localizedText(phoneDraft.label, 'fa').trim()
+        ? normalizeLocalizedValue(phoneDraft.label)
+        : normalizeLocalizedValue('شماره تماس'),
       number: phoneDraft.number.trim(),
-      note: phoneDraft.note.trim(),
+      note: normalizeLocalizedValue(phoneDraft.note),
+      whatsapp: phoneDraft.whatsapp === true,
       active: phoneDraft.active !== false,
       order: Number(phoneDraft.order) || (data.phones?.length || 0) + 1,
     }
 
-    const phones = phoneDraft.id
+    let phones = phoneDraft.id
       ? data.phones.map((phone) => phone.id === phoneDraft.id ? record : phone)
       : [...(data.phones || []), record]
+
+    if (record.whatsapp) {
+      phones = phones.map((phone) => ({
+        ...phone,
+        whatsapp: phone.id === record.id,
+      }))
+    }
 
     if (persist({ ...data, phones }, phoneDraft.id ? 'شماره تماس ویرایش شد.' : 'شماره تماس اضافه شد.')) {
       setPhoneModal(false)
@@ -287,7 +315,7 @@ function ContactAdmin() {
           <div className="contact-admin-items-grid">
             {sortedPhones.map((phone) => (
               <article key={phone.id} className={phone.active === false ? 'disabled' : ''}>
-                <small>شماره تماس</small><h3>{phone.label}</h3><strong dir="ltr">{phone.number}</strong><p>{phone.note || 'بدون یادداشت'}</p>
+                <small>{phone.whatsapp ? 'شماره واتساپ' : 'شماره تماس'}</small><h3>{localizedText(phone.label, 'fa')}</h3><strong dir="ltr">{phone.number}</strong><p>{localizedText(phone.note, 'fa') || 'بدون یادداشت'}</p>
                 <footer>
                   <button type="button" onClick={() => togglePhone(phone.id)}>{phone.active === false ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                   <button type="button" onClick={() => openEditPhone(phone)}><Pencil size={16} /></button>
@@ -308,7 +336,7 @@ function ContactAdmin() {
           <div className="contact-admin-items-grid">
             {sortedItems.map((item) => (
               <article key={item.id} className={item.active === false ? 'disabled' : ''}>
-                <small>{contactIconOptions.find((option) => option.value === item.icon)?.label || item.icon}</small><h3>{item.title}</h3><strong>{item.value}</strong><p>{item.note}</p>
+                <small>{contactIconOptions.find((option) => option.value === item.icon)?.label || item.icon}</small><h3>{localizedText(item.title, 'fa')}</h3><strong>{localizedText(item.value, 'fa')}</strong><p>{localizedText(item.note, 'fa')}</p>
                 <footer>
                   <button type="button" onClick={() => toggleItem(item.id)}>{item.active === false ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                   <button type="button" onClick={() => openEditItem(item)}><Pencil size={16} /></button>
@@ -397,6 +425,7 @@ function ContactAdmin() {
               <Field label="شماره تماس" value={phoneDraft.number} onChange={(value) => setPhoneDraft((current) => ({ ...current, number: value }))} placeholder="+93 700 000 000" />
               <Field label="یادداشت" value={phoneDraft.note} onChange={(value) => setPhoneDraft((current) => ({ ...current, note: value }))} placeholder="مثلاً: پاسخ‌گویی ۸ صبح تا ۵ عصر" />
               <Field label="ترتیب نمایش" type="number" value={phoneDraft.order} onChange={(value) => setPhoneDraft((current) => ({ ...current, order: value }))} />
+              <label className="contact-admin-checkbox"><input type="checkbox" checked={phoneDraft.whatsapp === true} onChange={(event) => setPhoneDraft((current) => ({ ...current, whatsapp: event.target.checked }))} /><span>برای واتساپ محصول استفاده شود</span></label>
               <label className="contact-admin-checkbox"><input type="checkbox" checked={phoneDraft.active !== false} onChange={(event) => setPhoneDraft((current) => ({ ...current, active: event.target.checked }))} /><span>فعال باشد</span></label>
             </div>
             <footer><button type="button" onClick={() => setPhoneModal(false)}>انصراف</button><button type="submit" className="primary"><Save size={16} />ذخیره شماره</button></footer>
@@ -412,6 +441,27 @@ function AdminCard({ title, description, children, onSave }) {
 }
 
 function Field({ label, value, onChange, textarea = false, full = false, type = 'text', placeholder = '', hint = '' }) {
+  if (type === 'text' && isLocalizedValue(value)) {
+    return (
+      <div className={full ? 'contact-admin-full' : ''}>
+        <LocalizedField
+          label={label}
+          value={value}
+          onChange={onChange}
+          multiline={textarea}
+          rows={4}
+          placeholder={
+            typeof placeholder === 'object'
+              ? placeholder
+              : { fa: placeholder, ps: placeholder, en: placeholder }
+          }
+          showTranslationActions={false}
+        />
+        {hint ? <small className="contact-admin-field-hint">{hint}</small> : null}
+      </div>
+    )
+  }
+
   return (
     <label className={full ? 'contact-admin-full' : ''}>
       <span>{label}</span>

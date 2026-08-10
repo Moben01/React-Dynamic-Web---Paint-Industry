@@ -1318,7 +1318,17 @@
   background: var(--management-card);
   font-size: 11px;
   line-height: 1.9;
+  white-space: pre-wrap;
   box-shadow: 0 6px 20px rgba(15, 23, 42, .04);
+}
+
+.assistant-admin-product-image {
+  width: min(100%, 260px);
+  max-height: 190px;
+  margin-top: 8px;
+  display: block;
+  object-fit: cover;
+  border-radius: 11px;
 }
 
 .assistant-admin-message > time {

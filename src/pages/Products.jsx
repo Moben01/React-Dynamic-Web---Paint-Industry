@@ -1,21 +1,49 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import {
-  ArrowLeft,
-  Info,
-  Search,
-  Sparkles,
-  X,
-} from 'lucide-react'
+import { ArrowLeft, Info, Search, Sparkles, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   loadProductsData,
   PRODUCTS_CHANGED_EVENT,
 } from '../data/productsStore'
+import { localizedArray, localizedText } from '../i18n/localizedContent'
+import { useLanguage } from '../i18n/LanguageContext'
 import './Products.css'
+
+function normalizeSearchText(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFKC')
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    .replace(/ي/g, 'ی')
+    .replace(/ى/g, 'ی')
+    .replace(/ك/g, 'ک')
+    .replace(/ۀ/g, 'ه')
+    .replace(/ة/g, 'ه')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function collectSearchStrings(value, bucket = []) {
+  if (value == null) return bucket
+  if (typeof value === 'string' || typeof value === 'number') {
+    const text = String(value).trim()
+    if (text) bucket.push(text)
+    return bucket
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectSearchStrings(item, bucket))
+    return bucket
+  }
+  if (typeof value === 'object') {
+    Object.values(value).forEach((item) => collectSearchStrings(item, bucket))
+  }
+  return bucket
+}
 
 function Products() {
   const [searchParams] = useSearchParams()
+  const { language, direction, t } = useLanguage()
   const [pageData, setPageData] = useState(loadProductsData)
   const [activeCategory, setActiveCategory] = useState(
     () => searchParams.get('category') || 'all',
@@ -24,15 +52,23 @@ function Products() {
 
   useEffect(() => {
     const refreshData = () => setPageData(loadProductsData())
-
     window.addEventListener(PRODUCTS_CHANGED_EVENT, refreshData)
     window.addEventListener('storage', refreshData)
-
     return () => {
       window.removeEventListener(PRODUCTS_CHANGED_EVENT, refreshData)
       window.removeEventListener('storage', refreshData)
     }
   }, [])
+
+  useEffect(() => {
+    const requestedCategory = searchParams.get('category')
+    if (requestedCategory) setActiveCategory(requestedCategory)
+  }, [searchParams])
+
+  const categoryMap = useMemo(
+    () => new Map(pageData.categories.map((item) => [String(item.id), item])),
+    [pageData.categories],
+  )
 
   const activeCategoryIds = useMemo(
     () =>
@@ -58,12 +94,16 @@ function Products() {
 
   const visibleCategories = useMemo(
     () => [
-      { id: 'all', label: 'همه محصولات', active: true },
+      {
+        id: 'all',
+        label: t('products.allProducts', 'همه محصولات'),
+        active: true,
+      },
       ...pageData.categories
         .filter((category) => category.active !== false)
         .sort((a, b) => Number(a.order || 0) - Number(b.order || 0)),
     ],
-    [pageData.categories],
+    [pageData.categories, t],
   )
 
   const featuredProduct = useMemo(
@@ -78,37 +118,51 @@ function Products() {
   )
 
   const filteredProducts = useMemo(() => {
-    const query = searchValue.trim().toLowerCase()
+    const query = normalizeSearchText(searchValue)
 
     return activeProducts.filter((product) => {
       const matchesCategory =
-        activeCategory === 'all' || product.category === activeCategory
-      const matchesSearch =
-        !query ||
-        product.name.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query) ||
-        product.categoryLabel.toLowerCase().includes(query)
+        activeCategory === 'all' || String(product.category) === String(activeCategory)
 
-      return matchesCategory && matchesSearch
+      if (!matchesCategory) return false
+      if (!query) return true
+
+      const category = categoryMap.get(String(product.category))
+      const haystack = normalizeSearchText(
+        collectSearchStrings([
+          product.name,
+          product.description,
+          product.finish,
+          product.coverage,
+          product.sizes,
+          category?.label,
+          category?.description,
+        ]).join(' '),
+      )
+
+      return haystack.includes(query)
     })
-  }, [activeCategory, activeProducts, searchValue])
+  }, [activeCategory, activeProducts, categoryMap, searchValue])
 
   useEffect(() => {
     const categoryExists = visibleCategories.some(
-      (category) => category.id === activeCategory,
+      (category) => String(category.id) === String(activeCategory),
     )
     if (!categoryExists) setActiveCategory('all')
   }, [activeCategory, visibleCategories])
 
+  const hero = pageData.hero
+  const catalog = pageData.catalog
+
   return (
-    <div className="products-shell">
+    <div className="products-shell" dir={direction}>
       <main className="products-page">
         <section className="products-hero">
           <div className="products-hero-glow products-hero-glow-one" />
           <div className="products-hero-glow products-hero-glow-two" />
 
           <div className="products-background-word" aria-hidden="true">
-            {pageData.hero.backgroundWord}
+            {hero.backgroundWord}
           </div>
 
           <div className="products-container products-hero-layout">
@@ -120,49 +174,52 @@ function Products() {
             >
               <span className="products-kicker">
                 <Sparkles size={17} />
-                {pageData.hero.kicker}
+                {localizedText(hero.kicker, language)}
               </span>
 
               <h1>
-                {pageData.hero.titleBefore}{' '}
-                <span>{pageData.hero.titleHighlight}</span>
+                {localizedText(hero.titleBefore, language)}{' '}
+                <span>{localizedText(hero.titleHighlight, language)}</span>
               </h1>
 
-              <p>{pageData.hero.description}</p>
+              <p>{localizedText(hero.description, language)}</p>
 
               <div className="products-hero-stats">
-                {pageData.hero.stats.map((stat) => (
+                {hero.stats.map((stat) => (
                   <div key={stat.id}>
                     <strong>{stat.value}</strong>
-                    <span>{stat.label}</span>
+                    <span>{localizedText(stat.label, language)}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
 
-            {featuredProduct && (
-              <motion.div
-                className="products-feature-card"
-                initial={{ opacity: 0, scale: 0.92, rotate: 3 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ duration: 0.75, delay: 0.12 }}
-              >
-                <img
-                  src={featuredProduct.images?.[0] || featuredProduct.image}
-                  alt={featuredProduct.name}
-                />
-                <div className="products-feature-shade" />
-                <span className="products-feature-badge">
-                  {pageData.hero.featuredBadge}
-                </span>
+            {featuredProduct && (() => {
+              const category = categoryMap.get(String(featuredProduct.category))
+              return (
+                <motion.div
+                  className="products-feature-card"
+                  initial={{ opacity: 0, scale: 0.92, rotate: 3 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.75, delay: 0.12 }}
+                >
+                  <img
+                    src={featuredProduct.images?.[0] || featuredProduct.image}
+                    alt={localizedText(featuredProduct.name, language)}
+                  />
+                  <div className="products-feature-shade" />
+                  <span className="products-feature-badge">
+                    {localizedText(hero.featuredBadge, language)}
+                  </span>
 
-                <div className="products-feature-content">
-                  <small>{featuredProduct.categoryLabel}</small>
-                  <h2>{featuredProduct.name}</h2>
-                  <p>{featuredProduct.description}</p>
-                </div>
-              </motion.div>
-            )}
+                  <div className="products-feature-content">
+                    <small>{localizedText(category?.label || featuredProduct.categoryLabel, language)}</small>
+                    <h2>{localizedText(featuredProduct.name, language)}</h2>
+                    <p>{localizedText(featuredProduct.description, language)}</p>
+                  </div>
+                </motion.div>
+              )
+            })()}
           </div>
         </section>
 
@@ -170,8 +227,8 @@ function Products() {
           <div className="products-container">
             <div className="products-catalog-head">
               <div>
-                <span>{pageData.catalog.kicker}</span>
-                <h2>{pageData.catalog.title}</h2>
+                <span>{localizedText(catalog.kicker, language)}</span>
+                <h2>{localizedText(catalog.title, language)}</h2>
               </div>
 
               <label className="products-search-box">
@@ -180,14 +237,14 @@ function Products() {
                   type="search"
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
-                  placeholder={pageData.catalog.searchPlaceholder}
+                  placeholder={localizedText(catalog.searchPlaceholder, language)}
                 />
 
                 {searchValue && (
                   <button
                     type="button"
                     onClick={() => setSearchValue('')}
-                    aria-label="پاک کردن جستجو"
+                    aria-label={t('products.clearSearch', 'پاک کردن جستجو')}
                   >
                     <X size={16} />
                   </button>
@@ -201,101 +258,120 @@ function Products() {
                   type="button"
                   key={category.id}
                   className={
-                    activeCategory === category.id ? 'is-active' : ''
+                    String(activeCategory) === String(category.id) ? 'is-active' : ''
                   }
                   onClick={() => setActiveCategory(category.id)}
                 >
-                  {category.label}
+                  {category.id === 'all'
+                    ? category.label
+                    : localizedText(category.label, language)}
                 </button>
               ))}
             </div>
 
             <motion.div layout className="products-grid">
               <AnimatePresence mode="popLayout">
-                {filteredProducts.map((product, index) => (
-                  <motion.article
-                    layout
-                    key={product.id}
-                    className="product-card"
-                    initial={{ opacity: 0, y: 28, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 18, scale: 0.94 }}
-                    transition={{ duration: 0.36, delay: index * 0.04 }}
-                  >
-                    <div className="product-card-image">
-                      <img
-                        src={product.images?.[0] || product.image}
-                        alt={product.name}
-                        loading="lazy"
-                      />
-                      <div className="product-card-overlay" />
+                {filteredProducts.map((product, index) => {
+                  const category = categoryMap.get(String(product.category))
+                  const productName = localizedText(product.name, language)
+                  const description = localizedText(product.description, language)
+                  const sizes = localizedArray(product.sizes, language)
 
-                      {product.featured && (
-                        <span className="product-card-featured">پرفروش</span>
-                      )}
+                  return (
+                    <motion.article
+                      layout
+                      key={product.id}
+                      className="product-card"
+                      initial={{ opacity: 0, y: 28, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 18, scale: 0.94 }}
+                      transition={{ duration: 0.36, delay: index * 0.04 }}
+                    >
+                      <Link
+                        to={`/products/${encodeURIComponent(product.id)}`}
+                        className="product-card-image product-card-click-target"
+                        aria-label={`${t('products.moreInfo', 'معلومات بیشتر')} ${productName}`}
+                      >
+                        <img
+                          src={product.images?.[0] || product.image}
+                          alt={productName}
+                          loading="lazy"
+                        />
+                        <div className="product-card-overlay" />
 
-                      <span className="product-card-category">
-                        {product.categoryLabel}
-                      </span>
-                    </div>
+                        {product.featured && (
+                          <span className="product-card-featured">
+                            {t('products.featured', 'پرفروش')}
+                          </span>
+                        )}
 
-                    <div className="product-card-body">
-                      <h3>{product.name}</h3>
-                      <p>{product.description}</p>
-
-                      <div className="product-color-row">
-                        <span>رنگ‌های پیشنهادی</span>
-
-                        <div>
-                          {product.colors.map((color) => (
-                            <i
-                              key={`${product.id}-${color}`}
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="product-card-details">
-                        <span>
-                          <small>نوع پوشش</small>
-                          <strong>{product.finish}</strong>
+                        <span className="product-card-category">
+                          {localizedText(category?.label || product.categoryLabel, language)}
                         </span>
+                      </Link>
 
-                        <span>
-                          <small>پوشش‌دهی</small>
-                          <strong>{product.coverage}</strong>
-                        </span>
-                      </div>
+                      <div className="product-card-body">
+                        <h3>
+                          <Link to={`/products/${encodeURIComponent(product.id)}`}>
+                            {productName}
+                          </Link>
+                        </h3>
+                        <p>{description}</p>
 
-                      <div className="product-card-footer">
-                        <div>
-                          {product.sizes.map((size) => (
-                            <span key={`${product.id}-${size}`}>{size}</span>
-                          ))}
+                        <div className="product-color-row">
+                          <span>{t('products.suggestedColors', 'رنگ‌های پیشنهادی')}</span>
+                          <div>
+                            {(product.colors || []).map((color) => (
+                              <i
+                                key={`${product.id}-${color}`}
+                                style={{ backgroundColor: color }}
+                              />
+                            ))}
+                          </div>
                         </div>
 
-                        <Link
-                          to={`/products/${product.id}`}
-                          className="product-card-info-link"
-                          aria-label={`معلومات بیشتر درباره ${product.name}`}
-                          title="معلومات بیشتر"
-                        >
-                          <Info size={19} />
-                          <span className="product-card-info-tooltip">معلومات بیشتر</span>
-                        </Link>
+                        <div className="product-card-details">
+                          <span>
+                            <small>{t('products.finish', 'نوع پوشش')}</small>
+                            <strong>{localizedText(product.finish, language)}</strong>
+                          </span>
+                          <span>
+                            <small>{t('products.coverage', 'پوشش‌دهی')}</small>
+                            <strong>{localizedText(product.coverage, language)}</strong>
+                          </span>
+                        </div>
+
+                        <div className="product-card-footer">
+                          <div>
+                            {sizes.map((size, sizeIndex) => (
+                              <span key={`${product.id}-${sizeIndex}`}>{size}</span>
+                            ))}
+                          </div>
+
+                          <Link
+                            to={`/products/${encodeURIComponent(product.id)}`}
+                            className="product-card-info-link"
+                            aria-label={`${t('products.moreInfo', 'معلومات بیشتر')} ${productName}`}
+                            title={t('products.moreInfo', 'معلومات بیشتر')}
+                          >
+                            <Info size={19} />
+                            <span className="product-card-info-tooltip">
+                              {t('products.moreInfo', 'معلومات بیشتر')}
+                            </span>
+                          </Link>
+                        </div>
                       </div>
-                    </div>
-                  </motion.article>
-                ))}
+                    </motion.article>
+                  )
+                })}
               </AnimatePresence>
             </motion.div>
 
-            {filteredProducts.length === 0 && (
+            {!filteredProducts.length && (
               <div className="products-empty-state">
-                <Search size={34} />
-                <h3>{pageData.catalog.emptyTitle}</h3>
-                <p>{pageData.catalog.emptyDescription}</p>
+                <Search size={30} />
+                <h3>{localizedText(catalog.emptyTitle, language)}</h3>
+                <p>{localizedText(catalog.emptyDescription, language)}</p>
               </div>
             )}
           </div>

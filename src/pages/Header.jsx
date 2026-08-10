@@ -15,12 +15,13 @@ import {
   Languages,
   Menu,
   Moon,
-  Phone,
+  Search,
   Sun,
   X,
 } from 'lucide-react'
 
 import { useLanguage } from '../i18n/LanguageContext'
+import SiteSearch from '../components/SiteSearch'
 
 import logo from '../../Assets/logo.png'
 import './Header.css'
@@ -109,6 +110,8 @@ function Header() {
   const [themeOpen, setThemeOpen] =
     useState(false)
 
+  const [searchOpen, setSearchOpen] = useState(false)
+
   const [
     languageOpen,
     setLanguageOpen,
@@ -148,6 +151,7 @@ function Header() {
     setMenuOpen(false)
     setThemeOpen(false)
     setLanguageOpen(false)
+    setSearchOpen(false)
 
     if (location.hash) {
       window.requestAnimationFrame(
@@ -200,6 +204,7 @@ function Header() {
         setMenuOpen(false)
         setThemeOpen(false)
         setLanguageOpen(false)
+        setSearchOpen(false)
       }
     }
 
@@ -548,20 +553,20 @@ function Header() {
             )}
           </div>
 
-          <Link
-            to="/contact"
-            className="site-header-contact-button"
-            onClick={closeMobileMenu}
+          <button
+            type="button"
+            className="site-header-search-button"
+            onClick={() => {
+              setSearchOpen(true)
+              setMenuOpen(false)
+              setThemeOpen(false)
+              setLanguageOpen(false)
+            }}
+            aria-label={t('header.search', 'Search')}
+            title={t('header.search', 'Search')}
           >
-            <Phone size={16} />
-
-            <span>
-              {t(
-                'header.contactUs',
-                'Contact us',
-              )}
-            </span>
-          </Link>
+            <Search size={19} />
+          </button>
 
           <button
             type="button"
@@ -588,6 +593,8 @@ function Header() {
           </button>
         </div>
       </div>
+
+      <SiteSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   )
 }

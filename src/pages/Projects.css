@@ -298,6 +298,21 @@
   gap: 78px;
 }
 
+.projects-page[dir='ltr'] .projects-hero-content {
+  order: 1;
+  text-align: left;
+}
+
+.projects-page[dir='ltr'] .projects-featured-card {
+  order: 2;
+}
+
+.projects-page[dir='ltr'] .projects-hero-actions,
+.projects-page[dir='ltr'] .projects-eyebrow,
+.projects-page[dir='ltr'] .projects-section-label {
+  flex-direction: row;
+}
+
 .projects-eyebrow,
 .projects-section-label {
   display: inline-flex;

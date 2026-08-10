@@ -13,6 +13,12 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
+import LocalizedField from '../components/LocalizedField'
+import {
+  createLocalizedValue,
+  localizedText,
+  normalizeLocalizedValue,
+} from '../i18n/localizedContent'
 import {
   loadProjectsData,
   projectCategoryOptions,
@@ -30,6 +36,13 @@ import './ProjectsAdmin.css'
 const MAX_IMAGE_SIZE = 12 * 1024 * 1024
 const MAX_IMAGE_EDGE = 1440
 const IMAGE_QUALITY = 0.7
+
+const L = (value = '') => createLocalizedValue(value, '', '')
+const faText = (value) => localizedText(value, 'fa')
+const searchableLocalized = (value) => {
+  const normalized = normalizeLocalizedValue(value)
+  return `${normalized.fa} ${normalized.ps} ${normalized.en}`
+}
 
 const compressProjectImage = (file) =>
   new Promise((resolve, reject) => {
@@ -65,18 +78,18 @@ const compressProjectImage = (file) =>
 
 const emptyForm = {
   id: '',
-  title: '',
+  title: L(''),
   category: 'exterior',
-  categoryLabel: 'نمای بیرونی',
-  location: '',
+  categoryLabel: createLocalizedValue('نمای بیرونی', 'بهرنۍ نما', 'Exterior'),
+  location: L(''),
   year: String(new Date().getFullYear()),
-  status: 'تکمیل‌شده',
-  client: '',
-  area: '',
-  description: '',
+  status: createLocalizedValue('تکمیل‌شده', 'بشپړه شوې', 'Completed'),
+  client: L(''),
+  area: L(''),
+  description: L(''),
   image: '',
   images: [],
-  alt: '',
+  alt: L(''),
   objectPosition: 'center',
   featured: false,
   order: 1,
@@ -223,7 +236,7 @@ function ProjectsAdmin({ searchTerm = '' }) {
         ? [form.image]
         : []
 
-    if (!form.title.trim()) {
+    if (!faText(form.title).trim()) {
       showAdminWarning('عنوان پروژه الزامی است.')
       return
     }
@@ -235,16 +248,17 @@ function ProjectsAdmin({ searchTerm = '' }) {
     const record = {
       ...form,
       id: form.id || `project-${Date.now()}`,
-      title: form.title.trim(),
-      categoryLabel: form.categoryLabel.trim(),
-      location: form.location.trim(),
+      title: normalizeLocalizedValue(form.title),
+      categoryLabel: normalizeLocalizedValue(form.categoryLabel),
+      location: normalizeLocalizedValue(form.location),
       year: String(form.year || '').trim(),
-      client: form.client.trim(),
-      area: form.area.trim(),
-      description: form.description.trim(),
+      status: normalizeLocalizedValue(form.status),
+      client: normalizeLocalizedValue(form.client),
+      area: normalizeLocalizedValue(form.area),
+      description: normalizeLocalizedValue(form.description),
       image: images[0],
       images,
-      alt: form.alt.trim() || form.title.trim(),
+      alt: faText(form.alt).trim() ? normalizeLocalizedValue(form.alt) : normalizeLocalizedValue(form.title),
       order: Number(form.order) || data.projects.length + 1,
       featured: Boolean(form.featured),
       active: Boolean(form.active),
@@ -303,7 +317,7 @@ function ProjectsAdmin({ searchTerm = '' }) {
   const requestDelete = async (project) => {
     const confirmed = await confirmAdminAction({
       title: 'حذف پروژه',
-      text: `آیا پروژه «${project.title}» حذف شود؟ این عمل قابل برگشت نیست.`,
+      text: `آیا پروژه «${faText(project.title)}» حذف شود؟ این عمل قابل برگشت نیست.`,
       confirmText: 'حذف',
       cancelText: 'انصراف',
     })
@@ -339,7 +353,7 @@ function ProjectsAdmin({ searchTerm = '' }) {
     const query = searchTerm.trim().toLowerCase()
     return [...data.projects]
       .filter((project) =>
-        `${project.title} ${project.categoryLabel} ${project.location} ${project.client} ${project.status}`
+        `${searchableLocalized(project.title)} ${searchableLocalized(project.categoryLabel)} ${searchableLocalized(project.location)} ${searchableLocalized(project.client)} ${searchableLocalized(project.status)}`
           .toLowerCase()
           .includes(query),
       )
@@ -379,35 +393,17 @@ function ProjectsAdmin({ searchTerm = '' }) {
               <p>تمام عنوان‌ها، توضیحات و نوشته پس‌زمینه این بخش را مدیریت کنید.</p>
             </div>
           </header>
-          <div className="projects-admin-section-form">
-            <label>
-              <span>نوشته کوچک بالا</span>
-              <input value={data.section.eyebrow} onChange={(e) => updateSection('eyebrow', e.target.value)} />
-            </label>
-            <label>
-              <span>قسمت اول عنوان</span>
-              <input value={data.section.title} onChange={(e) => updateSection('title', e.target.value)} />
-            </label>
-            <label>
-              <span>قسمت رنگی عنوان</span>
-              <input value={data.section.highlight} onChange={(e) => updateSection('highlight', e.target.value)} />
-            </label>
+          <div className="projects-admin-section-form projects-admin-localized-section-form">
+            <LocalizedField label="نوشته کوچک بالا" value={data.section.eyebrow} onChange={(value) => updateSection('eyebrow', value)} showTranslationTools={false} />
+            <LocalizedField label="قسمت اول عنوان" value={data.section.title} onChange={(value) => updateSection('title', value)} showTranslationTools={false} />
+            <LocalizedField label="قسمت رنگی عنوان" value={data.section.highlight} onChange={(value) => updateSection('highlight', value)} showTranslationTools={false} />
             <label>
               <span>نوشته بزرگ پس‌زمینه</span>
               <input value={data.section.backgroundWord} onChange={(e) => updateSection('backgroundWord', e.target.value)} dir="ltr" />
             </label>
-            <label className="full">
-              <span>توضیحات</span>
-              <textarea rows="4" value={data.section.description} onChange={(e) => updateSection('description', e.target.value)} />
-            </label>
-            <label className="full">
-              <span>متن راهنما پایین اسلایدر</span>
-              <input value={data.section.hint} onChange={(e) => updateSection('hint', e.target.value)} />
-            </label>
-            <label className="full">
-              <span>پیام نبودن پروژه</span>
-              <input value={data.section.emptyMessage} onChange={(e) => updateSection('emptyMessage', e.target.value)} />
-            </label>
+            <LocalizedField className="projects-admin-full-localized" label="توضیحات" multiline rows={4} value={data.section.description} onChange={(value) => updateSection('description', value)} showTranslationTools={false} />
+            <LocalizedField className="projects-admin-full-localized" label="متن راهنما پایین اسلایدر" value={data.section.hint} onChange={(value) => updateSection('hint', value)} showTranslationTools={false} />
+            <LocalizedField className="projects-admin-full-localized" label="پیام نبودن پروژه" value={data.section.emptyMessage} onChange={(value) => updateSection('emptyMessage', value)} showTranslationTools={false} />
           </div>
           <footer>
             <button type="button" onClick={saveSection}>
@@ -430,7 +426,7 @@ function ProjectsAdmin({ searchTerm = '' }) {
             {filteredProjects.map((project) => (
               <article key={project.id} className={project.active === false ? 'is-disabled' : ''}>
                 <div className="projects-admin-image">
-                  <img src={project.image} alt={project.alt || project.title} style={{ objectPosition: project.objectPosition || 'center' }} />
+                  <img src={project.image} alt={faText(project.alt) || faText(project.title)} style={{ objectPosition: project.objectPosition || 'center' }} />
                   <span>{project.year}</span>
                   {project.featured && <b><Star size={14} fill="currentColor" /> منتخب</b>}
                   {(project.images?.length || (project.image ? 1 : 0)) > 1 && (
@@ -438,11 +434,11 @@ function ProjectsAdmin({ searchTerm = '' }) {
                   )}
                 </div>
                 <div className="projects-admin-content">
-                  <small>{project.categoryLabel}</small>
-                  <h3>{project.title}</h3>
-                  <p>{project.location || 'موقعیت ثبت نشده'}</p>
+                  <small>{faText(project.categoryLabel)}</small>
+                  <h3>{faText(project.title)}</h3>
+                  <p>{faText(project.location) || 'موقعیت ثبت نشده'}</p>
                   <div>
-                    <span>{project.status}</span>
+                    <span>{faText(project.status)}</span>
                     <strong>{project.active === false ? 'غیرفعال' : 'فعال'}</strong>
                   </div>
                 </div>
@@ -514,19 +510,19 @@ function ProjectsAdmin({ searchTerm = '' }) {
                 </div>
               </aside>
 
-              <div className="projects-admin-fields">
-                <label><span>عنوان پروژه *</span><input value={form.title} onChange={(e) => updateForm('title', e.target.value)} /></label>
-                <label><span>دسته‌بندی</span><select value={form.category} onChange={(e) => changeCategory(e.target.value)}>{projectCategoryOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
-                <label><span>عنوان دسته‌بندی روی کارت</span><input value={form.categoryLabel} onChange={(e) => updateForm('categoryLabel', e.target.value)} /></label>
-                <label><span>موقعیت</span><input value={form.location} onChange={(e) => updateForm('location', e.target.value)} /></label>
+              <div className="projects-admin-fields projects-admin-localized-fields">
+                <LocalizedField label="عنوان پروژه" required value={form.title} onChange={(value) => updateForm('title', value)} showTranslationTools={false} placeholder={{ fa: 'عنوان پروژه را وارد کنید', ps: 'د پروژې نوم ولیکئ', en: 'Enter project title' }} />
+                <label><span>دسته‌بندی</span><select value={form.category} onChange={(e) => changeCategory(e.target.value)}>{projectCategoryOptions.map((item) => <option key={item.value} value={item.value}>{faText(item.label)}</option>)}</select></label>
+                <LocalizedField label="عنوان دسته‌بندی روی کارت" value={form.categoryLabel} onChange={(value) => updateForm('categoryLabel', value)} showTranslationTools={false} />
+                <LocalizedField label="موقعیت" value={form.location} onChange={(value) => updateForm('location', value)} showTranslationTools={false} />
                 <label><span>سال</span><input value={form.year} onChange={(e) => updateForm('year', e.target.value)} /></label>
-                <label><span>حالت پروژه</span><select value={form.status} onChange={(e) => updateForm('status', e.target.value)}><option value="تکمیل‌شده">تکمیل‌شده</option><option value="در حال اجرا">در حال اجرا</option><option value="متوقف‌شده">متوقف‌شده</option></select></label>
-                <label><span>مشتری</span><input value={form.client} onChange={(e) => updateForm('client', e.target.value)} /></label>
-                <label><span>مساحت</span><input value={form.area} onChange={(e) => updateForm('area', e.target.value)} /></label>
+                <LocalizedField label="حالت پروژه" value={form.status} onChange={(value) => updateForm('status', value)} showTranslationTools={false} placeholder={{ fa: 'مثلاً تکمیل‌شده', ps: 'لکه بشپړه شوې', en: 'e.g. Completed' }} />
+                <LocalizedField label="مشتری" value={form.client} onChange={(value) => updateForm('client', value)} showTranslationTools={false} />
+                <LocalizedField label="مساحت" value={form.area} onChange={(value) => updateForm('area', value)} showTranslationTools={false} />
                 <label><span>ترتیب نمایش</span><input type="number" min="1" value={form.order} onChange={(e) => updateForm('order', e.target.value)} /></label>
                 <label><span>موقعیت عکس اصلی</span><select value={form.objectPosition} onChange={(e) => updateForm('objectPosition', e.target.value)}><option value="center">وسط</option><option value="top">بالا</option><option value="bottom">پایین</option><option value="left">چپ</option><option value="right">راست</option></select></label>
-                <label className="is-full"><span>متن Alt تصویر</span><input value={form.alt} onChange={(e) => updateForm('alt', e.target.value)} /></label>
-                <label className="is-full"><span>توضیحات</span><textarea rows="5" value={form.description} onChange={(e) => updateForm('description', e.target.value)} /></label>
+                <LocalizedField className="projects-admin-full-localized" label="متن Alt تصویر" value={form.alt} onChange={(value) => updateForm('alt', value)} showTranslationTools={false} />
+                <LocalizedField className="projects-admin-full-localized" label="توضیحات" multiline rows={5} value={form.description} onChange={(value) => updateForm('description', value)} showTranslationTools={false} />
                 <label className="check"><input type="checkbox" checked={form.featured} onChange={(e) => updateForm('featured', e.target.checked)} /><span>پروژه منتخب باشد</span></label>
                 <label className="check"><input type="checkbox" checked={form.active} onChange={(e) => updateForm('active', e.target.checked)} /><span>پروژه فعال باشد</span></label>
               </div>

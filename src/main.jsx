@@ -7,7 +7,13 @@ import {
 
 import App from './App'
 import { LanguageProvider } from './i18n/LanguageContext'
+import { prepareI18nMigration } from './i18n/i18nMigration'
 import './styles.css'
+
+// Phase 1: create a safe three-language staging copy and a one-time backup.
+// Current production storage is intentionally untouched until every public/admin page
+// has been switched to localizedText()/LocalizedField in the next phases.
+prepareI18nMigration()
 
 const Router =
   window.location.protocol === 'file:'

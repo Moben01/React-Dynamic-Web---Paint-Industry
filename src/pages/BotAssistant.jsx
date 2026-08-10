@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Clock3,
   History,
@@ -13,6 +13,7 @@ import {
 import botImage from '../../Assets/bot.png'
 import {
   addAssistantMessage,
+  assistantSettingText,
   createAssistantConversation,
   deleteAssistantConversation,
   getAssistantConversations,
@@ -22,6 +23,7 @@ import {
   setAssistantVisitor,
   subscribeAssistantStore,
 } from '../data/assistantStore'
+import { useLanguage } from '../i18n/LanguageContext'
 import './BotAssistant.css'
 
 function formatDate(value) {
@@ -32,7 +34,80 @@ function formatDate(value) {
   }
 }
 
+function extractProductImage(text) {
+  const match = String(text || '').match(/عکس محصول:\s*(\S+)/)
+  return match?.[1] || ''
+}
+
+const botLabels = {
+  fa: {
+    openAssistant: 'باز کردن دستیار هوشمند',
+    closeAssistant: 'بستن دستیار هوشمند',
+    close: 'بستن',
+    newConversation: 'گفتگوی جدید',
+    startConversation: 'شروع گفتگو',
+    chat: 'چت',
+    history: 'تاریخچه',
+    chatWithName: 'گفتگو با نام',
+    today: 'امروز',
+    sendMessage: 'ارسال پیام',
+    historyTitle: 'تاریخچه گفتگوها',
+    savedConversations: 'گفتگو ذخیره شده است.',
+    searchConversation: 'جستجوی گفتگو...',
+    newConversationFallback: 'گفتگوی جدید',
+    deleteConversation: 'حذف گفتگو',
+    selectedProduct: 'محصول انتخاب‌شده',
+    productImageReady: 'عکس محصول آماده ارسال است',
+    removeProductAttachment: 'حذف ضمیمه محصول',
+    productAlt: 'محصول',
+  },
+  ps: {
+    openAssistant: 'هوښیار مرستیال پرانیزئ',
+    closeAssistant: 'هوښیار مرستیال بند کړئ',
+    close: 'بندول',
+    newConversation: 'نوې خبرې',
+    startConversation: 'خبرې پیل کړئ',
+    chat: 'چټ',
+    history: 'تاریخچه',
+    chatWithName: 'د نوم سره خبرې',
+    today: 'نن',
+    sendMessage: 'پیغام لېږل',
+    historyTitle: 'د خبرو تاریخچه',
+    savedConversations: 'خبرې خوندي شوې دي.',
+    searchConversation: 'خبرې ولټوئ...',
+    newConversationFallback: 'نوې خبرې',
+    deleteConversation: 'خبرې ړنګول',
+    selectedProduct: 'ټاکل شوی محصول',
+    productImageReady: 'د محصول عکس د لېږلو لپاره چمتو دی',
+    removeProductAttachment: 'د محصول ضمیمه لرې کول',
+    productAlt: 'محصول',
+  },
+  en: {
+    openAssistant: 'Open smart assistant',
+    closeAssistant: 'Close smart assistant',
+    close: 'Close',
+    newConversation: 'New conversation',
+    startConversation: 'Start conversation',
+    chat: 'Chat',
+    history: 'History',
+    chatWithName: 'Chatting as',
+    today: 'Today',
+    sendMessage: 'Send message',
+    historyTitle: 'Conversation history',
+    savedConversations: 'conversations saved.',
+    searchConversation: 'Search conversations...',
+    newConversationFallback: 'New conversation',
+    deleteConversation: 'Delete conversation',
+    selectedProduct: 'Selected product',
+    productImageReady: 'Product image is ready to send',
+    removeProductAttachment: 'Remove product attachment',
+    productAlt: 'Product',
+  },
+}
+
 function BotAssistant() {
+  const { language, direction } = useLanguage()
+  const labels = botLabels[language] || botLabels.fa
   const [open, setOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('chat')
   const [search, setSearch] = useState('')
@@ -43,6 +118,7 @@ function BotAssistant() {
     getAssistantConversations(),
   )
   const [visitor, setVisitorState] = useState(() => getAssistantVisitor())
+  const [pendingProductRequest, setPendingProductRequest] = useState(null)
   const messageListRef = useRef(null)
 
   const refreshStore = () => {
@@ -52,6 +128,20 @@ function BotAssistant() {
   }
 
   useEffect(() => subscribeAssistantStore(refreshStore), [])
+
+  useEffect(() => {
+    const handleProductRequest = (event) => {
+      const detail = event.detail || {}
+      setPendingProductRequest(detail)
+      setOpen(true)
+      setActiveTab('chat')
+    }
+
+    window.addEventListener('alimi-assistant-product-request', handleProductRequest)
+    return () => {
+      window.removeEventListener('alimi-assistant-product-request', handleProductRequest)
+    }
+  }, [])
 
   const activeConversation = useMemo(() => {
     if (!visitor?.activeConversationId) return null
@@ -109,6 +199,25 @@ function BotAssistant() {
     }
   }, [activeConversation, visitor?.name, visitor?.visitorId, visitorConversations])
 
+  useEffect(() => {
+    if (!pendingProductRequest || !visitor?.name || activeConversation) return
+
+    let cancelled = false
+
+    const prepareConversation = async () => {
+      const conversation = await createAssistantConversation(visitor.name, language)
+      if (cancelled || !conversation) return
+      setVisitorState(getAssistantVisitor())
+      setActiveTab('chat')
+    }
+
+    prepareConversation()
+
+    return () => {
+      cancelled = true
+    }
+  }, [activeConversation, pendingProductRequest, visitor?.name, language])
+  const setting = (field) => assistantSettingText(settings, field, language)
   if (!settings.enabled) return null
 
   const startWithName = async (event) => {
@@ -116,7 +225,7 @@ function BotAssistant() {
     const cleanName = nameInput.trim()
     if (!cleanName) return
 
-    const conversation = await createAssistantConversation(cleanName)
+    const conversation = await createAssistantConversation(cleanName, language)
     if (!conversation) return
 
     setNameInput('')
@@ -128,18 +237,31 @@ function BotAssistant() {
     const cleanText = text.trim()
     if (!cleanText || !activeConversation?.id) return
 
+    const productAttachmentText = pendingProductRequest
+      ? [
+          '',
+          '---',
+          'ضمیمه محصول',
+          pendingProductRequest.productName ? `نام محصول: ${pendingProductRequest.productName}` : '',
+          pendingProductRequest.productId ? `آیدی محصول: ${pendingProductRequest.productId}` : '',
+          pendingProductRequest.productUrl ? `لینک محصول: ${pendingProductRequest.productUrl}` : '',
+          pendingProductRequest.productImage ? `عکس محصول: ${pendingProductRequest.productImage}` : '',
+        ].filter(Boolean).join('\n')
+      : ''
+
     await addAssistantMessage(activeConversation.id, {
       sender: 'user',
       senderName: visitor?.name,
-      text: cleanText,
+      text: `${cleanText}${productAttachmentText}`,
     })
     setMessage('')
+    setPendingProductRequest(null)
     setActiveTab('chat')
   }
 
   const handleNewConversation = async () => {
     if (!visitor?.name) return
-    const conversation = await createAssistantConversation(visitor.name)
+    const conversation = await createAssistantConversation(visitor.name, language)
     if (!conversation) return
     setVisitorState(getAssistantVisitor())
     setActiveTab('chat')
@@ -166,7 +288,7 @@ function BotAssistant() {
       if (remaining[0]) {
         chooseConversation(remaining[0].id)
       } else {
-        const replacement = await createAssistantConversation(visitor?.name)
+        const replacement = await createAssistantConversation(visitor?.name, language)
         if (replacement) chooseConversation(replacement.id)
       }
     }
@@ -178,13 +300,13 @@ function BotAssistant() {
         type="button"
         className={`alimi-bot-launcher ${open ? 'is-open' : ''}`}
         onClick={() => setOpen((current) => !current)}
-        aria-label={open ? 'بستن دستیار هوشمند' : 'باز کردن دستیار هوشمند'}
+        aria-label={open ? labels.closeAssistant : labels.openAssistant}
       >
-        {open ? <X size={22} /> : <img src={botImage} alt={settings.title} />}
+        {open ? <X size={22} /> : <img src={botImage} alt={setting('title')} />}
       </button>
 
       {open && (
-        <section className="alimi-bot-window" dir="rtl">
+        <section className="alimi-bot-window" dir={direction}>
           <header className="alimi-bot-header">
             <div className="alimi-bot-header-profile">
               <span className="alimi-bot-header-avatar">
@@ -192,10 +314,10 @@ function BotAssistant() {
               </span>
 
               <div>
-                <strong>{settings.title}</strong>
+                <strong>{setting('title')}</strong>
                 <small>
                   <i />
-                  {settings.statusText}
+                  {setting('statusText')}
                 </small>
               </div>
             </div>
@@ -205,8 +327,8 @@ function BotAssistant() {
                 <button
                   type="button"
                   onClick={handleNewConversation}
-                  aria-label="گفتگوی جدید"
-                  title="گفتگوی جدید"
+                  aria-label={labels.newConversation}
+                  title={labels.newConversation}
                 >
                   <Plus size={18} />
                 </button>
@@ -215,7 +337,7 @@ function BotAssistant() {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="بستن"
+                aria-label={labels.close}
               >
                 <X size={19} />
               </button>
@@ -227,19 +349,19 @@ function BotAssistant() {
               <span className="alimi-bot-name-icon">
                 <UserRound size={28} />
               </span>
-              <h3>{settings.namePromptTitle}</h3>
-              <p>{settings.namePromptText}</p>
+              <h3>{setting('namePromptTitle')}</h3>
+              <p>{setting('namePromptText')}</p>
 
               <form onSubmit={startWithName}>
                 <input
                   autoFocus
                   value={nameInput}
                   onChange={(event) => setNameInput(event.target.value)}
-                  placeholder={settings.namePlaceholder}
+                  placeholder={setting('namePlaceholder')}
                   maxLength={60}
                 />
                 <button type="submit" disabled={!nameInput.trim()}>
-                  شروع گفتگو
+                  {labels.startConversation}
                 </button>
               </form>
             </div>
@@ -252,7 +374,7 @@ function BotAssistant() {
                   onClick={() => setActiveTab('chat')}
                 >
                   <MessageCircle size={15} />
-                  چت
+                  {labels.chat}
                 </button>
 
                 <button
@@ -261,7 +383,7 @@ function BotAssistant() {
                   onClick={() => setActiveTab('history')}
                 >
                   <History size={15} />
-                  تاریخچه
+                  {labels.history}
                 </button>
               </nav>
 
@@ -269,18 +391,19 @@ function BotAssistant() {
                 {activeTab === 'chat' && (
                   <main className="alimi-bot-chat">
                     <div className="alimi-bot-visitor-bar">
-                      <span>گفتگو با نام</span>
+                      <span>{labels.chatWithName}</span>
                       <strong>{visitor.name}</strong>
                     </div>
 
                     <div className="alimi-bot-messages" ref={messageListRef}>
                       <div className="alimi-bot-chat-date">
                         <Clock3 size={12} />
-                        امروز
+                        {labels.today}
                       </div>
 
                       {activeConversation?.messages.map((item) => {
                         const isUser = item.sender === 'user'
+                        const productImage = extractProductImage(item.text)
                         return (
                           <div
                             key={item.id}
@@ -301,6 +424,13 @@ function BotAssistant() {
                               </small>
                               <div className="alimi-bot-message-bubble">
                                 {item.text}
+                                {productImage && (
+                                  <img
+                                    className="alimi-bot-message-product-image"
+                                    src={productImage}
+                                    alt=""
+                                  />
+                                )}
                               </div>
                             </div>
                           </div>
@@ -315,6 +445,28 @@ function BotAssistant() {
                         sendMessage(message)
                       }}
                     >
+                      {pendingProductRequest && (
+                        <div className="alimi-bot-product-attachment">
+                          {pendingProductRequest.productImage && (
+                            <img
+                              src={pendingProductRequest.productImage}
+                              alt={pendingProductRequest.productName || labels.productAlt}
+                            />
+                          )}
+                          <span>
+                            <strong>{pendingProductRequest.productName || labels.selectedProduct}</strong>
+                            <small>{pendingProductRequest.productId ? `ID: ${pendingProductRequest.productId}` : labels.productImageReady}</small>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setPendingProductRequest(null)}
+                            aria-label={labels.removeProductAttachment}
+                          >
+                            <X size={15} />
+                          </button>
+                        </div>
+                      )}
+
                       <textarea
                         value={message}
                         onChange={(event) => setMessage(event.target.value)}
@@ -324,14 +476,14 @@ function BotAssistant() {
                             sendMessage(message)
                           }
                         }}
-                        placeholder={settings.messagePlaceholder}
+                        placeholder={setting('messagePlaceholder')}
                         rows={1}
                       />
 
                       <button
                         type="submit"
                         disabled={!message.trim() || !activeConversation}
-                        aria-label="ارسال پیام"
+                        aria-label={labels.sendMessage}
                       >
                         <Send size={18} />
                       </button>
@@ -342,8 +494,8 @@ function BotAssistant() {
                 {activeTab === 'history' && (
                   <div className="alimi-bot-panel">
                     <div className="alimi-bot-panel-title">
-                      <strong>تاریخچه گفتگوها</strong>
-                      <small>{visitorConversations.length} گفتگو ذخیره شده است.</small>
+                      <strong>{labels.historyTitle}</strong>
+                      <small>{visitorConversations.length} {labels.savedConversations}</small>
                     </div>
 
                     <label className="alimi-bot-search">
@@ -351,7 +503,7 @@ function BotAssistant() {
                       <input
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
-                        placeholder="جستجوی گفتگو..."
+                        placeholder={labels.searchConversation}
                       />
                     </label>
 
@@ -375,7 +527,7 @@ function BotAssistant() {
                               <strong>
                                 {conversation.messages
                                   .filter((item) => !item.system)
-                                  .at(-1)?.text?.slice(0, 34) || 'گفتگوی جدید'}
+                                  .at(-1)?.text?.slice(0, 34) || labels.newConversationFallback}
                               </strong>
                               <small>{formatDate(conversation.updatedAt)}</small>
                             </span>
@@ -385,7 +537,7 @@ function BotAssistant() {
                             type="button"
                             className="alimi-bot-history-delete"
                             onClick={() => removeConversation(conversation.id)}
-                            aria-label="حذف گفتگو"
+                            aria-label={labels.deleteConversation}
                           >
                             <Trash2 size={15} />
                           </button>

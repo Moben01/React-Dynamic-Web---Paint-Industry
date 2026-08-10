@@ -15,6 +15,8 @@ import {
   AnimatePresence,
   motion,
 } from 'framer-motion'
+import { localizedText } from '../i18n/localizedContent'
+import { useLanguage } from '../i18n/LanguageContext'
 import {
   loadProjectsData,
   PROJECTS_CHANGED_EVENT,
@@ -22,9 +24,11 @@ import {
 import './ProjectArchive.css'
 
 function ProjectArchive() {
+  const { language, direction: pageDirection, t } = useLanguage()
+  const l = (value) => localizedText(value, language)
   const [pageData, setPageData] = useState(loadProjectsData)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [direction, setDirection] = useState(1)
+  const [slideDirection, setSlideDirection] = useState(1)
 
   useEffect(() => {
     const refreshProjects = () => {
@@ -114,7 +118,7 @@ function ProjectArchive() {
     nextDirection = 1,
   ) => {
     if (!activeProjects.length) return
-    setDirection(nextDirection)
+    setSlideDirection(nextDirection)
     setActiveIndex(nextIndex)
   }
 
@@ -153,7 +157,7 @@ function ProjectArchive() {
     <section
       className="project-archive-section"
       id="projects"
-     
+      dir={pageDirection}
     >
       <div
         className="project-archive-background-word"
@@ -167,17 +171,17 @@ function ProjectArchive() {
           <div className="project-archive-heading">
             <span className="project-archive-eyebrow">
               <Sparkles size={17} />
-              {pageData.section.eyebrow}
+              {l(pageData.section.eyebrow)}
             </span>
 
             <h2>
-              {pageData.section.title}{' '}
+              {l(pageData.section.title)}{' '}
               <strong>
-                {pageData.section.highlight}
+                {l(pageData.section.highlight)}
               </strong>
             </h2>
 
-            <p>{pageData.section.description}</p>
+            <p>{l(pageData.section.description)}</p>
           </div>
 
           <div className="project-archive-navigation">
@@ -214,8 +218,8 @@ function ProjectArchive() {
                   <img
                     src={previousProject.image}
                     alt={
-                      previousProject.alt ||
-                      previousProject.title
+                      l(previousProject.alt) ||
+                      l(previousProject.title)
                     }
                     style={{
                       objectPosition:
@@ -224,18 +228,18 @@ function ProjectArchive() {
                     }}
                   />
                   <div className="project-archive-side-overlay" />
-                  <span>{previousProject.title}</span>
+                  <span>{l(previousProject.title)}</span>
                 </button>
               )}
 
               <AnimatePresence
                 mode="wait"
-                custom={direction}
+                custom={slideDirection}
               >
                 <motion.article
                   key={currentProject.id}
                   className="project-archive-main-card"
-                  custom={direction}
+                  custom={slideDirection}
                   variants={projectVariants}
                   initial="enter"
                   animate="center"
@@ -248,8 +252,8 @@ function ProjectArchive() {
                   <img
                     src={currentProject.image}
                     alt={
-                      currentProject.alt ||
-                      currentProject.title
+                      l(currentProject.alt) ||
+                      l(currentProject.title)
                     }
                     style={{
                       objectPosition:
@@ -273,25 +277,25 @@ function ProjectArchive() {
 
                   <div className="project-archive-card-content">
                     <small>
-                      {currentProject.categoryLabel ||
+                      {l(currentProject.categoryLabel) ||
                         currentProject.category}
                     </small>
 
-                    <h3>{currentProject.title}</h3>
+                    <h3>{l(currentProject.title)}</h3>
 
                     <div className="project-archive-location">
                       <MapPin size={14} />
                       <span>
-                        {currentProject.location ||
-                          'افغانستان'}
+                        {l(currentProject.location) ||
+                          t('projects.afghanistan', 'افغانستان')}
                       </span>
                     </div>
                   </div>
 
                   <Link
   className="project-archive-open-button"
-  to="/projects"
-  aria-label={`مشاهده ${currentProject.title}`}
+  to={`/projects/${encodeURIComponent(currentProject.id)}`}
+  aria-label={`${t('projects.viewProject', 'مشاهده پروژه')} ${l(currentProject.title)}`}
 >
   <ExternalLink size={22} />
 </Link>
@@ -308,8 +312,8 @@ function ProjectArchive() {
                   <img
                     src={nextProject.image}
                     alt={
-                      nextProject.alt ||
-                      nextProject.title
+                      l(nextProject.alt) ||
+                      l(nextProject.title)
                     }
                     style={{
                       objectPosition:
@@ -318,7 +322,7 @@ function ProjectArchive() {
                     }}
                   />
                   <div className="project-archive-side-overlay" />
-                  <span>{nextProject.title}</span>
+                  <span>{l(nextProject.title)}</span>
                 </button>
               )}
             </div>
@@ -365,12 +369,12 @@ function ProjectArchive() {
               <i>
                 <span />
               </i>
-              <p>{pageData.section.hint}</p>
+              <p>{l(pageData.section.hint)}</p>
             </div>
           </>
         ) : (
           <div className="project-archive-empty">
-            {pageData.section.emptyMessage}
+            {l(pageData.section.emptyMessage)}
           </div>
         )}
       </div>

@@ -676,3 +676,130 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* ==================================
+   PROJECTS I18N FIELDS
+================================== */
+.projects-admin-localized-section-form,
+.projects-admin-localized-fields {
+  align-items: start;
+}
+
+.projects-admin-full-localized {
+  grid-column: 1 / -1;
+}
+
+.projects-admin .localized-field {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.projects-admin .localized-field-heading {
+  min-height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.projects-admin .localized-field-heading > span {
+  margin: 0 !important;
+  color: #555d68;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.projects-admin .localized-field-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--management-border);
+  border-radius: 9px;
+  background: #f8fafc;
+}
+
+.projects-admin .localized-field-tabs button {
+  position: relative;
+  min-width: 46px;
+  height: 27px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  color: #64748b;
+  background: transparent;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.projects-admin .localized-field-tabs button.active {
+  color: #fff;
+  background: var(--management-primary);
+  box-shadow: 0 3px 8px rgba(255, 107, 26, 0.2);
+}
+
+.projects-admin .localized-field-tabs button i {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.projects-admin .localized-field > input,
+.projects-admin .localized-field > textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--management-border);
+  border-radius: 9px;
+  outline: 0;
+  color: var(--management-text);
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.projects-admin .localized-field > input {
+  height: 43px;
+  padding: 0 12px;
+}
+
+.projects-admin .localized-field > textarea {
+  min-height: 105px;
+  padding: 11px 12px;
+  resize: vertical;
+  line-height: 1.8;
+}
+
+.projects-admin .localized-field > input:focus,
+.projects-admin .localized-field > textarea:focus {
+  border-color: var(--management-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.1);
+}
+
+@media (max-width: 700px) {
+  .projects-admin-full-localized {
+    grid-column: auto;
+  }
+
+  .projects-admin .localized-field-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .projects-admin .localized-field-tabs {
+    width: 100%;
+  }
+
+  .projects-admin .localized-field-tabs button {
+    flex: 1;
+  }
+}

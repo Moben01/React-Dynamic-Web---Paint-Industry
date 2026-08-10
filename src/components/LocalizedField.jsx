@@ -45,6 +45,7 @@ function LocalizedField({
   multiline = false,
   rows = 4,
   placeholder = {},
+  showTranslationActions = true,
 }) {
   const [activeLanguage, setActiveLanguage] =
     useState('fa')
@@ -182,6 +183,7 @@ function LocalizedField({
         }
       />
 
+      {showTranslationActions && (
       <div className="localized-field-actions">
         <button
           type="button"
@@ -225,6 +227,7 @@ function LocalizedField({
           Google Translate
         </button>
       </div>
+      )}
     </div>
   )
 }

@@ -18,6 +18,8 @@ import {
   createContactMessage,
   loadContactData,
 } from '../data/contactStore'
+import { localizedText } from '../i18n/localizedContent'
+import { useLanguage } from '../i18n/LanguageContext'
 import './Contact.css'
 
 const iconMap = {
@@ -28,6 +30,7 @@ const iconMap = {
 }
 
 function Contact() {
+  const { language, direction } = useLanguage()
   const [pageData, setPageData] = useState(loadContactData)
   const [submitted, setSubmitted] = useState(false)
   const [formData, setFormData] = useState({
@@ -66,14 +69,22 @@ function Contact() {
     const phones = activePhones.map((phone, index) => ({
       id: phone.id,
       icon: 'phone',
-      title: phone.label || `شماره تماس ${index + 1}`,
+      title: localizedText(phone.label, language) || `????? ???? ${index + 1}`,
       value: phone.number,
-      note: phone.note || '',
+      note: localizedText(phone.note, language) || '',
       href: `tel:${String(phone.number).replace(/[^+\d]/g, '')}`,
       order: Number(phone.order || index + 1),
     }))
-    return [...phones, ...contactItems]
-  }, [activePhones, contactItems])
+    return [
+      ...phones,
+      ...contactItems.map((item) => ({
+        ...item,
+        title: localizedText(item.title, language),
+        value: localizedText(item.value, language),
+        note: localizedText(item.note, language),
+      })),
+    ]
+  }, [activePhones, contactItems, language])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -91,9 +102,10 @@ function Contact() {
   const primaryPhone = activePhones[0]
   const primaryPhoneHref = primaryPhone?.number ? `tel:${String(primaryPhone.number).replace(/[^+\d]/g, '')}` : `tel:${pageData.finalCta.phone}`
   const fields = pageData.formSection.fields
+  const text = (value) => localizedText(value, language)
 
   return (
-    <div className="contact-shell">
+    <div className="contact-shell" dir={direction}>
       <main className="contact-page">
         <section className="contact-hero">
           <div className="contact-hero-grid-bg" aria-hidden="true" />
@@ -104,18 +116,18 @@ function Contact() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65 }}
             >
-              <span className="contact-kicker"><Sparkles size={17} />{pageData.hero.kicker}</span>
-              <h1>{pageData.hero.title}<span> {pageData.hero.highlight}</span></h1>
-              <p>{pageData.hero.description}</p>
+              <span className="contact-kicker"><Sparkles size={17} />{text(pageData.hero.kicker)}</span>
+              <h1>{text(pageData.hero.title)}<span> {text(pageData.hero.highlight)}</span></h1>
+              <p>{text(pageData.hero.description)}</p>
               <div className="contact-hero-actions">
                 <a href="#contact-form" className="contact-primary-btn">
-                  {pageData.hero.primaryButtonText}<ArrowLeft size={18} />
+                  {text(pageData.hero.primaryButtonText)}<ArrowLeft size={18} />
                 </a>
                 <a
                   href={primaryPhoneHref}
                   className="contact-secondary-btn"
                 >
-                  {pageData.hero.secondaryButtonText}<Phone size={17} />
+                  {text(pageData.hero.secondaryButtonText)}<Phone size={17} />
                 </a>
               </div>
             </motion.div>
@@ -130,8 +142,8 @@ function Contact() {
               <div className="contact-orbit-ring contact-orbit-ring-two" />
               <div className="contact-orbit-core">
                 <MessageCircle size={46} />
-                <strong>{pageData.hero.orbitTitle}</strong>
-                <span>{pageData.hero.orbitDescription}</span>
+                <strong>{text(pageData.hero.orbitTitle)}</strong>
+                <span>{text(pageData.hero.orbitDescription)}</span>
               </div>
               <div className="contact-floating-point contact-point-phone"><Phone size={20} /></div>
               <div className="contact-floating-point contact-point-mail"><Mail size={20} /></div>
@@ -169,14 +181,14 @@ function Contact() {
         <section className="contact-form-section" id="contact-form">
           <div className="contact-container contact-form-layout">
             <div className="contact-form-intro">
-              <span className="contact-kicker"><Send size={17} />{pageData.formSection.kicker}</span>
-              <h2>{pageData.formSection.title}<span> {pageData.formSection.highlight}</span></h2>
-              <p>{pageData.formSection.description}</p>
+              <span className="contact-kicker"><Send size={17} />{text(pageData.formSection.kicker)}</span>
+              <h2>{text(pageData.formSection.title)}<span> {text(pageData.formSection.highlight)}</span></h2>
+              <p>{text(pageData.formSection.description)}</p>
               <div className="contact-support-note">
                 <div><Building2 size={22} /></div>
                 <span>
-                  <strong>{pageData.formSection.supportTitle}</strong>
-                  {pageData.formSection.supportDescription}
+                  <strong>{text(pageData.formSection.supportTitle)}</strong>
+                  {text(pageData.formSection.supportDescription)}
                 </span>
               </div>
             </div>
@@ -190,19 +202,19 @@ function Contact() {
               transition={{ duration: 0.6 }}
             >
               <div className="contact-form-row">
-                <label><span>{fields.fullNameLabel}</span><div><UserRound size={18} /><input name="fullName" value={formData.fullName} onChange={handleChange} placeholder={fields.fullNamePlaceholder} required /></div></label>
-                <label><span>{fields.phoneLabel}</span><div><Phone size={18} /><input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder={fields.phonePlaceholder} required /></div></label>
+                <label><span>{text(fields.fullNameLabel)}</span><div><UserRound size={18} /><input name="fullName" value={formData.fullName} onChange={handleChange} placeholder={text(fields.fullNamePlaceholder)} required /></div></label>
+                <label><span>{text(fields.phoneLabel)}</span><div><Phone size={18} /><input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder={text(fields.phonePlaceholder)} required /></div></label>
               </div>
               <div className="contact-form-row">
-                <label><span>{fields.emailLabel}</span><div><Mail size={18} /><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder={fields.emailPlaceholder} /></div></label>
-                <label><span>{fields.subjectLabel}</span><div><MessageCircle size={18} /><input name="subject" value={formData.subject} onChange={handleChange} placeholder={fields.subjectPlaceholder} required /></div></label>
+                <label><span>{text(fields.emailLabel)}</span><div><Mail size={18} /><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder={text(fields.emailPlaceholder)} /></div></label>
+                <label><span>{text(fields.subjectLabel)}</span><div><MessageCircle size={18} /><input name="subject" value={formData.subject} onChange={handleChange} placeholder={text(fields.subjectPlaceholder)} required /></div></label>
               </div>
               <label className="contact-message-field">
-                <span>{fields.messageLabel}</span>
-                <textarea name="message" value={formData.message} onChange={handleChange} placeholder={fields.messagePlaceholder} required />
+                <span>{text(fields.messageLabel)}</span>
+                <textarea name="message" value={formData.message} onChange={handleChange} placeholder={text(fields.messagePlaceholder)} required />
               </label>
-              <button type="submit" className="contact-submit-button">{pageData.formSection.submitButtonText}<Send size={18} /></button>
-              {submitted && <div className="contact-success-message"><Check size={18} />{pageData.formSection.successMessage}</div>}
+              <button type="submit" className="contact-submit-button">{text(pageData.formSection.submitButtonText)}<Send size={18} /></button>
+              {submitted && <div className="contact-success-message"><Check size={18} />{text(pageData.formSection.successMessage)}</div>}
             </motion.form>
           </div>
         </section>
@@ -214,7 +226,7 @@ function Contact() {
                 <iframe
                   className="contact-google-map"
                   src={pageData.location.mapEmbedUrl}
-                  title={pageData.location.mapTitle || 'Google Map'}
+                  title={text(pageData.location.mapTitle) || 'Google Map'}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   allowFullScreen
@@ -229,8 +241,8 @@ function Contact() {
                 </>
               )}
               <div className="contact-map-label">
-                <strong>{pageData.location.mapTitle}</strong>
-                <span>{pageData.location.mapAddress}</span>
+                <strong>{text(pageData.location.mapTitle)}</strong>
+                <span>{text(pageData.location.mapAddress)}</span>
                 {pageData.location.mapOpenUrl && (
                   <a href={pageData.location.mapOpenUrl} target="_blank" rel="noreferrer">بازکردن در گوگل مپ</a>
                 )}
@@ -238,12 +250,12 @@ function Contact() {
             </div>
 
             <div className="contact-location-copy">
-              <span className="contact-kicker"><MapPin size={17} />{pageData.location.kicker}</span>
-              <h2>{pageData.location.title}<span> {pageData.location.highlight}</span></h2>
-              <p>{pageData.location.description}</p>
+              <span className="contact-kicker"><MapPin size={17} />{text(pageData.location.kicker)}</span>
+              <h2>{text(pageData.location.title)}<span> {text(pageData.location.highlight)}</span></h2>
+              <p>{text(pageData.location.description)}</p>
               <div className="contact-location-details">
-                <div><small>{pageData.location.addressLabel}</small><strong>{pageData.location.address}</strong></div>
-                <div id="working-hours"><small>{pageData.location.workingHoursLabel}</small><strong>{pageData.location.workingHours}</strong></div>
+                <div><small>{text(pageData.location.addressLabel)}</small><strong>{text(pageData.location.address)}</strong></div>
+                <div id="working-hours"><small>{text(pageData.location.workingHoursLabel)}</small><strong>{text(pageData.location.workingHours)}</strong></div>
               </div>
             </div>
           </div>
@@ -252,8 +264,8 @@ function Contact() {
         <section className="contact-final-cta">
           <div className="contact-container">
             <div className="contact-final-card">
-              <div><span>{pageData.finalCta.kicker}</span><h2>{pageData.finalCta.title}</h2></div>
-              <a href={primaryPhoneHref}>{pageData.finalCta.buttonText}<Phone size={18} /></a>
+              <div><span>{text(pageData.finalCta.kicker)}</span><h2>{text(pageData.finalCta.title)}</h2></div>
+              <a href={primaryPhoneHref}>{text(pageData.finalCta.buttonText)}<Phone size={18} /></a>
             </div>
           </div>
         </section>

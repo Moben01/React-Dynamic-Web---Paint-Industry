@@ -6,6 +6,7 @@ import {
   CONTACT_CHANGED_EVENT,
   loadContactData,
 } from '../data/contactStore'
+import { localizedText } from '../i18n/localizedContent'
 import logo from '../../Assets/logo.png'
 import './Footer.css'
 
@@ -55,6 +56,7 @@ function Footer() {
   const { language, direction } = useLanguage()
   const [data, setData] = useState(loadContactData)
   const labels = copy[language] || copy.fa
+  const text = (value) => localizedText(value, language)
 
   useEffect(() => {
     const refresh = () => setData(loadContactData())
@@ -104,13 +106,13 @@ function Footer() {
               {phones.map((phone) => (
                 <a key={phone.id} href={`tel:${String(phone.number).replace(/[^+\d]/g, '')}`}>
                   <Phone size={17} />
-                  <span><small>{phone.label}</small><b dir="ltr">{phone.number}</b></span>
+                  <span><small>{text(phone.label)}</small><b dir="ltr">{phone.number}</b></span>
                 </a>
               ))}
               {email?.value && (
-                <a href={email.href || `mailto:${email.value}`}>
+                <a href={email.href || `mailto:${text(email.value)}`}>
                   <Mail size={17} />
-                  <span><small>{email.title}</small><b dir="ltr">{email.value}</b></span>
+                  <span><small>{text(email.title)}</small><b dir="ltr">{text(email.value)}</b></span>
                 </a>
               )}
             </div>
@@ -119,8 +121,8 @@ function Footer() {
           <section>
             <h3>{labels.office}</h3>
             <div className="site-footer-office">
-              <div><MapPin size={17} /><span>{data.location.address}</span></div>
-              <div><Clock3 size={17} /><span><small>{labels.hours}</small>{data.location.workingHours}</span></div>
+              <div><MapPin size={17} /><span>{text(data.location.address)}</span></div>
+              <div><Clock3 size={17} /><span><small>{labels.hours}</small>{text(data.location.workingHours)}</span></div>
               {data.location.mapOpenUrl && (
                 <a href={data.location.mapOpenUrl} target="_blank" rel="noreferrer">Google Maps</a>
               )}
