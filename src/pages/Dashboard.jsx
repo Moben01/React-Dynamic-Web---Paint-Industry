@@ -41,23 +41,23 @@ import ProjectArchive from './ProjectArchive'
 const themes = [
   {
     id: 'alimi',
-    label: 'سفید و نارنجی',
-    swatches: ['#ffffff', '#ff6b1a', '#1c1c1c'],
+    label: 'آبی و نارنجی علیمی',
+    swatches: ['#ffffff', '#2587be', '#f79331'],
   },
   {
     id: 'midnight',
     label: 'شب مدرن',
-    swatches: ['#111318', '#ff7a25', '#f7f7f7'],
+    swatches: ['#111318', '#2587be', '#f79331'],
   },
   {
     id: 'sand',
     label: 'گرم و لوکس',
-    swatches: ['#fbf4e8', '#d65d24', '#34241b'],
+    swatches: ['#fbf4e8', '#2587be', '#f79331'],
   },
   {
     id: 'ocean',
     label: 'آرام و حرفه‌ای',
-    swatches: ['#f7fbff', '#ff6b1a', '#15364a'],
+    swatches: ['#f7fbff', '#2587be', '#f79331'],
   },
 ]
 

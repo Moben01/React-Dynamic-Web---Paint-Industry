@@ -27,11 +27,13 @@ import {
   X,
   LockKeyhole,
   ShieldCheck,
+  Store,
 } from 'lucide-react'
 
 import DashboardImages from './DashboardImages'
 import ProjectsAdmin from './ProjectsAdmin'
 import ProductsAdmin from './ProductsAdmin'
+import AgenciesAdmin from './AgenciesAdmin'
 import AboutAdmin from './AboutAdmin'
 import ContactAdmin from './ContactAdmin'
 import LocalizedField from '../components/LocalizedField'
@@ -74,6 +76,11 @@ const getManagementTabs = (t) => [
     id: 'projects',
     label: t('admin.projects'),
     icon: FolderKanban,
+  },
+  {
+    id: 'agencies',
+    label: t('admin.agencies', 'نمایندگی‌ها'),
+    icon: Store,
   },
   {
     id: 'messages',
@@ -303,6 +310,10 @@ function ProjectsTab({ searchTerm }) {
   return <ProjectsAdmin searchTerm={searchTerm} />
 }
 
+function AgenciesTab({ searchTerm }) {
+  return <AgenciesAdmin searchTerm={searchTerm} />
+}
+
 function MessagesTab({ searchTerm }) {
   const filteredMessages = messages.filter((message) =>
     `${message.name} ${message.phone} ${message.subject}`
@@ -348,6 +359,7 @@ function MessagesTab({ searchTerm }) {
 function SettingsTab() {
   const [settingsSection, setSettingsSection] = useState('assistant-settings')
   const [settings, setSettings] = useState(() => getAssistantSettings())
+  const settingsDirtyRef = useRef(false)
   const [adminAuth, setAdminAuth] = useState(() => getAdminAuth())
   const [conversations, setConversations] = useState(() =>
     getAssistantConversations(),
@@ -362,7 +374,9 @@ function SettingsTab() {
   const { language } = useLanguage()
 
   const refreshAssistantData = () => {
-    setSettings(getAssistantSettings())
+    if (!settingsDirtyRef.current) {
+      setSettings(getAssistantSettings())
+    }
     const nextConversations = getAssistantConversations()
     setConversations(nextConversations)
     setActiveConversationId((current) => {
@@ -408,12 +422,15 @@ function SettingsTab() {
   }, [activeConversation?.id, activeConversation?.messages.length])
 
   const updateField = (field, value) => {
+    settingsDirtyRef.current = true
     setSettings((current) => ({ ...current, [field]: value }))
     setSaved(false)
   }
 
   const saveSettings = async () => {
-    await saveAssistantSettings(settings)
+    const savedSettings = await saveAssistantSettings(settings)
+    settingsDirtyRef.current = false
+    setSettings(savedSettings)
     setSaved(true)
     window.setTimeout(() => setSaved(false), 2200)
   }
@@ -846,7 +863,7 @@ function ManagementTable({ columns, children }) {
 }
 
 function AdminLogin({ direction, onLogin }) {
-  const [email, setEmail] = useState('admin@gmail.com')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
@@ -876,7 +893,6 @@ function AdminLogin({ direction, onLogin }) {
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="admin@gmail.com"
             dir="ltr"
             autoComplete="username"
             autoFocus
@@ -889,7 +905,6 @@ function AdminLogin({ direction, onLogin }) {
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="mynameisadmin"
             dir="ltr"
             autoComplete="current-password"
           />
@@ -974,6 +989,9 @@ function Management() {
 
       case 'projects':
         return <ProjectsTab searchTerm={searchTerm} />
+
+      case 'agencies':
+        return <AgenciesTab searchTerm={searchTerm} />
 
       case 'messages':
         return <ContactAdmin />
@@ -1162,6 +1180,7 @@ function Management() {
                 {activeTab !== 'dashboard' &&
                   activeTab !== 'settings' &&
                   activeTab !== 'projects' &&
+                  activeTab !== 'agencies' &&
                   activeTab !== 'products' &&
                   activeTab !== 'about' &&
                   activeTab !== 'messages' && (

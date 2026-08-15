@@ -220,14 +220,18 @@
   display: flex;
   align-items: flex-end;
   gap: 7px;
+  opacity: 0;
+  animation: alimiBotMessageFade .36s ease forwards;
 }
 
 .alimi-bot-message-row.is-user {
   justify-content: flex-start;
+  --alimi-message-enter-x: -12px;
 }
 
 .alimi-bot-message-row.is-assistant {
   justify-content: flex-end;
+  --alimi-message-enter-x: 12px;
 }
 
 .alimi-bot-message-avatar {
@@ -267,6 +271,20 @@
   border: 1px solid var(--line);
   border-bottom-right-radius: 4px;
   background: var(--surface);
+}
+
+@keyframes alimiBotMessageFade {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--alimi-message-enter-x, 0), 12px, 0) scale(.98);
+    filter: blur(3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
 }
 
 .alimi-bot-composer {
@@ -721,5 +739,12 @@
   .alimi-bot-message-bubble {
     font-size: 11px;
     line-height: 1.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alimi-bot-message-row {
+    opacity: 1;
+    animation: none;
   }
 }

@@ -31,14 +31,15 @@ const themes = [
     id: 'alimi',
 
     labels: {
-      fa: 'سفید و نارنجی',
-      ps: 'سپین او نارنجي',
-      en: 'White and Orange',
+      fa: 'آبی و نارنجی علیمی',
+      ps: 'د علیمي آبي او نارنجي',
+      en: 'Alimi Blue and Orange',
     },
 
     swatches: [
       '#ffffff',
-      '#ff6b1a',
+      '#2587be',
+      '#f79331',
       '#1c1c1c',
     ],
   },
@@ -54,7 +55,8 @@ const themes = [
 
     swatches: [
       '#111318',
-      '#ff7a25',
+      '#2587be',
+      '#f79331',
       '#f7f7f7',
     ],
   },
@@ -70,7 +72,8 @@ const themes = [
 
     swatches: [
       '#fbf4e8',
-      '#d65d24',
+      '#2587be',
+      '#f79331',
       '#34241b',
     ],
   },
@@ -86,7 +89,8 @@ const themes = [
 
     swatches: [
       '#f7fbff',
-      '#ff6b1a',
+      '#2587be',
+      '#f79331',
       '#15364a',
     ],
   },
@@ -351,6 +355,17 @@ function Header() {
             {t(
               'header.projects',
               'Projects',
+            )}
+          </NavLink>
+
+          <NavLink
+            to="/agencies"
+            className={navClassName}
+            onClick={closeMobileMenu}
+          >
+            {t(
+              'header.agencies',
+              'نمایندگی‌ها',
             )}
           </NavLink>
 

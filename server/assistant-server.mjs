@@ -670,6 +670,17 @@ const server = http.createServer(async (req, res) => {
   return json(res, 404, { message: 'Not found' })
 })
 
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.log(`Alimi server already running on http://127.0.0.1:${PORT}`)
+    console.log('Keeping assistant process alive so the web app can continue.')
+    setInterval(() => {}, 60 * 60 * 1000)
+    return
+  }
+
+  throw error
+})
+
 server.listen(PORT, HOST, async () => {
   if (pool) await ensureSchema()
   console.log(`Alimi server: http://127.0.0.1:${PORT}`)

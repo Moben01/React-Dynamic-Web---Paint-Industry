@@ -1,5 +1,6 @@
 import { loadProductsData } from '../data/productsStore'
 import { loadProjectsData } from '../data/projectsStore'
+import { loadAgenciesData } from '../data/agenciesStore'
 import { getHeroContent, getSlides } from '../data/dashboardSlides'
 import { localizedText } from '../i18n/localizedContent'
 
@@ -65,6 +66,7 @@ export function searchSite(rawQuery, language = 'fa', t = (_key, fallback) => fa
 
   const productsData = loadProductsData()
   const projectsData = loadProjectsData()
+  const agenciesData = loadAgenciesData()
   const hero = getHeroContent()
   const slides = getSlides()
 
@@ -145,6 +147,35 @@ export function searchSite(rawQuery, language = 'fa', t = (_key, fallback) => fa
       )
     })
 
+  agenciesData.agencies
+    .filter((item) => item.active !== false)
+    .forEach((agency) => {
+      push(
+        {
+          id: `agency:${agency.id}`,
+          type: 'agency',
+          entityId: agency.id,
+          title: localizedText(agency.name, language),
+          description: localizedText(agency.description, language) || localizedText(agency.summary, language),
+          image: agency.image || agency.images?.[0] || '',
+          path: `/agencies/${encodeURIComponent(agency.id)}`,
+          label: t('header.agencies', 'نمایندگی‌ها'),
+        },
+        [
+          agency.name,
+          agency.description,
+          agency.summary,
+          agency.address,
+          agency.city,
+          agency.manager,
+          agency.phone,
+          agency.email,
+          agency.hours,
+          agency.services,
+        ],
+      )
+    })
+
   slides
     .filter((item) => item.active !== false)
     .forEach((slide) => {
@@ -180,6 +211,12 @@ export function searchSite(rawQuery, language = 'fa', t = (_key, fallback) => fa
       title: t('header.projects', 'پروژه‌ها'),
       path: '/projects',
       terms: ['پروژه‌ها', 'پروژه', 'پروژې', 'Projects', 'Project'],
+    },
+    {
+      id: 'page:agencies',
+      title: t('header.agencies', 'نمایندگی‌ها'),
+      path: '/agencies',
+      terms: ['نمایندگی‌ها', 'نمایندگی', 'نمایندګۍ', 'Agencies', 'Agency', 'Dealer'],
     },
     {
       id: 'page:about',

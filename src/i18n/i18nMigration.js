@@ -131,12 +131,22 @@ function collectCmsSourceKeys() {
 function backupOnce(key, raw) {
   const backupKey = `${BACKUP_PREFIX}${key}`
   if (localStorage.getItem(backupKey) === null && raw !== null) {
-    localStorage.setItem(backupKey, raw)
+    try {
+      localStorage.setItem(backupKey, raw)
+    } catch (error) {
+      console.warn('Skipping i18n backup because browser storage is full:', error)
+    }
   }
 }
 
 function stage(key, value) {
-  localStorage.setItem(`${STAGING_PREFIX}${key}`, JSON.stringify(value))
+  try {
+    localStorage.setItem(`${STAGING_PREFIX}${key}`, JSON.stringify(value))
+    return true
+  } catch (error) {
+    console.warn('Skipping i18n migration stage because browser storage is full:', error)
+    return false
+  }
 }
 
 export function prepareI18nMigration() {
@@ -164,8 +174,7 @@ export function prepareI18nMigration() {
     if (group === 'contactStore') migrated = migrateContactStore(parsed)
     if (group === 'assistantSettings') migrated = migrateAssistantSettings(parsed)
 
-    stage(key, migrated)
-    stagedKeys.push(key)
+    if (stage(key, migrated)) stagedKeys.push(key)
   }
 
   for (const key of collectCmsSourceKeys()) {
@@ -174,8 +183,7 @@ export function prepareI18nMigration() {
     if (parsed === null) continue
     backupOnce(key, raw)
     const section = key.split(':').pop()
-    stage(key, migrateCmsSection(section, parsed))
-    stagedKeys.push(key)
+    if (stage(key, migrateCmsSection(section, parsed))) stagedKeys.push(key)
   }
 
   const meta = {

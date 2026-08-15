@@ -1,0 +1,306 @@
+.agencies-admin,
+.agencies-admin-card {
+  display: grid;
+  gap: 18px;
+}
+
+.agencies-admin-tabs,
+.agencies-admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.agencies-admin-tabs button,
+.agencies-admin-toolbar button,
+.agencies-admin-card footer button,
+.agencies-admin-actions button {
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--card);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.agencies-admin-tabs button.active,
+.agencies-admin-toolbar button,
+.agencies-admin-card footer button,
+.agencies-admin-actions .save {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+}
+
+.agencies-admin-tabs .reset {
+  color: var(--danger, #d33);
+}
+
+.agencies-admin-card,
+.agencies-admin-list article,
+.agencies-admin-modal {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.agencies-admin-card {
+  padding: 18px;
+}
+
+.agencies-admin-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.agencies-admin-fields label,
+.agencies-admin-fields .localized-field {
+  display: grid;
+  gap: 8px;
+}
+
+.agencies-admin-fields input,
+.agencies-admin-fields textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+}
+
+.agencies-admin-full {
+  grid-column: 1 / -1;
+}
+
+.agencies-admin-list {
+  display: grid;
+  gap: 12px;
+}
+
+.agencies-admin-list article {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.agencies-admin-thumb {
+  width: 86px;
+  height: 70px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: color-mix(in srgb, var(--secondary) 12%, var(--surface));
+}
+
+.agencies-admin-list article.is-disabled {
+  opacity: 0.55;
+}
+
+.agencies-admin-list h3,
+.agencies-admin-list p {
+  margin: 0;
+}
+
+.agencies-admin-list small {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.agencies-admin-list p {
+  color: var(--muted);
+}
+
+.agencies-admin-list footer {
+  display: flex;
+  gap: 7px;
+}
+
+.agencies-admin-list footer button,
+.agencies-admin-modal header button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.agencies-admin-list footer .danger {
+  color: #d33;
+}
+
+.agencies-admin-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 6000;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.agencies-admin-modal {
+  width: min(980px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 20px;
+}
+
+.agencies-admin-modal header {
+  margin-bottom: 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.agencies-admin-modal h2,
+.agencies-admin-modal p {
+  margin: 0;
+}
+
+.agencies-admin-modal p {
+  color: var(--muted);
+}
+
+.agencies-admin-fields .check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.agencies-admin-fields .check input {
+  width: auto;
+  min-height: auto;
+}
+
+.agencies-admin-image-picker {
+  padding: 14px;
+  border: 1px dashed color-mix(in srgb, var(--secondary) 35%, var(--line));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--secondary) 5%, var(--card));
+}
+
+.agencies-admin-image-picker > button {
+  min-height: 54px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 28%, var(--line));
+  border-radius: 8px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.agencies-admin-image-picker > button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.agencies-admin-gallery {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 12px;
+}
+
+.agencies-admin-gallery > p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+}
+
+.agencies-admin-gallery > div {
+  position: relative;
+  overflow: hidden;
+  min-height: 118px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.agencies-admin-gallery > div.is-primary {
+  border-color: var(--secondary);
+}
+
+.agencies-admin-gallery img {
+  width: 100%;
+  height: 118px;
+  display: block;
+  object-fit: cover;
+}
+
+.agencies-admin-gallery > div > span {
+  position: absolute;
+  top: 8px;
+  inset-inline-start: 8px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.agencies-admin-gallery footer {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.agencies-admin-gallery footer button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+.agencies-admin-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 760px) {
+  .agencies-admin-fields,
+  .agencies-admin-list article {
+    grid-template-columns: 1fr;
+  }
+
+  .agencies-admin-thumb {
+    width: 100%;
+    height: 160px;
+  }
+}

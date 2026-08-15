@@ -51,6 +51,8 @@ function SiteSearch({ open, onClose }) {
       target = `/products/${encodeURIComponent(result.entityId)}`
     } else if (result.type === 'project' && result.entityId != null) {
       target = `/projects/${encodeURIComponent(result.entityId)}`
+    } else if (result.type === 'agency' && result.entityId != null) {
+      target = `/agencies/${encodeURIComponent(result.entityId)}`
     }
 
     onClose()

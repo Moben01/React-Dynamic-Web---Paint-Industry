@@ -6,12 +6,15 @@ import Products from './pages/Products'
 import ProductDetails from './pages/ProductDetails'
 import Projects from './pages/Projects'
 import ProjectDetails from './pages/ProjectDetails'
+import Agencies from './pages/Agencies'
+import AgencyDetails from './pages/AgencyDetails'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Header from './pages/Header'
 import BotAssistant from './pages/BotAssistant'
 import Footer from './components/Footer'
 import ScrollToTopButton from './components/ScrollToTopButton'
+import SEO from './components/SEO'
 
 function PublicLayout() {
   return (
@@ -24,6 +27,8 @@ function PublicLayout() {
         <Route path="/products/:productId" element={<ProductDetails />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/:projectId" element={<ProjectDetails />} />
+        <Route path="/agencies" element={<Agencies />} />
+        <Route path="/agencies/:agencyId" element={<AgencyDetails />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -37,10 +42,13 @@ function PublicLayout() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/admin/*" element={<Management />} />
-      <Route path="/*" element={<PublicLayout />} />
-    </Routes>
+    <>
+      <SEO />
+      <Routes>
+        <Route path="/admin/*" element={<Management />} />
+        <Route path="/*" element={<PublicLayout />} />
+      </Routes>
+    </>
   )
 }
 

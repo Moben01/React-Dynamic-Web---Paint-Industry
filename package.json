@@ -12,9 +12,10 @@
     "preview": "vite preview",
     "electron": "wait-on http://127.0.0.1:5173 && electron .",
     "electron:dev": "concurrently -k \"npm run dev\" \"npm run electron\"",
+    "seo:generate": "node scripts/generate-seo-files.mjs",
     "desktop:build": "npm run build && electron-builder --win",
     "desktop:portable": "npm run build && electron-builder --win portable",
-    "dev:web": "vite --host 0.0.0.0",
+    "dev:web": "vite",
     "assistant:server": "node server/assistant-server.mjs"
   },
   "dependencies": {
